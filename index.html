@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="ChowdaQuest RI ranks Rhode Island clam chowder and clam cakes with help from Chowder, the Chief Inspector." />
+  <meta property="og:title" content="ChowdaQuest RI" />
+  <meta property="og:description" content="Finding Rhode Island’s best clam chowder and clam cakes, one bowl at a time." />
+  <meta property="og:image" content="/assets/chowder-hero.png" />
+  <title>ChowdaQuest RI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Inter:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="#top" aria-label="ChowdaQuest home">
+        <span class="brand-seal"><img src="./assets/chowder-hero.png" alt="Chowder the cat" /></span>
+        <span>
+          <strong>ChowdaQuest</strong>
+          <em>Rhode ⚓ Island</em>
+        </span>
+      </a>
+
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#rankings">Rankings</a>
+        <a href="#explore">Explore</a>
+        <a href="#drive">Worth The Drive™</a>
+        <a href="#feedback">Feedback</a>
+        <button class="add-review" data-scroll="#feedback">+ Add Review</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-art" role="img" aria-label="Chowder the cat wearing a captain hat beside chowder and a lighthouse"></div>
+      <div class="hero-copy">
+        <p class="stamp">Rhode Island Chowder Inspector</p>
+        <h1>Further Investigation Required.</h1>
+        <p class="lede">Finding Rhode Island’s best clam chowder and clam cakes, one bowl at a time.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#rankings">⚓ Explore Rankings</a>
+          <a class="button secondary" href="#explore">⌖ Find Restaurants</a>
+        </div>
+        <p class="prototype-note">Feedback prototype: reviews save locally in this browser until Supabase is connected.</p>
+      </div>
+    </section>
+
+    <section class="rankings section" id="rankings">
+      <div class="wrap">
+        <div class="ribbon">Top Ranked Right Now ★</div>
+        <div class="rank-grid" id="rankGrid"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap content-grid">
+        <article class="panel">
+          <div class="section-heading">
+            <h2>Featured Restaurants</h2>
+            <a href="#explore">View all restaurants →</a>
+          </div>
+          <div class="restaurant-cards" id="featuredCards"></div>
+        </article>
+
+        <aside class="panel drive-panel" id="drive">
+          <h2>Worth The Drive™</h2>
+          <p class="quote">“Chowder worth crossing the bridge.”</p>
+          <div class="ri-map" aria-hidden="true">
+            <span class="pin providence">Providence</span>
+            <span class="pin bristol">Bristol</span>
+            <span class="pin newport">Newport</span>
+            <span class="pin narragansett">Narragansett</span>
+            <span class="pin westerly">Westerly</span>
+          </div>
+          <button class="button primary full" type="button">⚓ See All Destinations</button>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section explore" id="explore">
+      <div class="wrap panel">
+        <div class="section-heading">
+          <h2>Find Restaurants</h2>
+          <p>Search by name, town, region, or chowder style.</p>
+        </div>
+        <div class="filters">
+          <input id="searchInput" placeholder="Restaurant name..." autocomplete="off" />
+          <select id="regionSelect"><option value="">All Locations</option></select>
+          <select id="categorySelect">
+            <option value="">All Categories</option>
+            <option value="ri">RI Chowder</option>
+            <option value="ne">New England Chowder</option>
+            <option value="manhattan">Manhattan Chowder</option>
+            <option value="cakes">Clam Cakes</option>
+          </select>
+          <button class="button primary" id="searchButton" type="button">Search</button>
+        </div>
+        <div class="chips" aria-label="Quick filters">
+          <button data-category="ri">Clam Chowder</button>
+          <button data-category="cakes">Clam Cakes</button>
+          <button data-region="Newport County">Newport County</button>
+          <button data-region="South County">South County</button>
+          <button data-region="East Bay">East Bay</button>
+        </div>
+        <div class="restaurant-list" id="restaurantList"></div>
+      </div>
+    </section>
+
+    <section class="section testimonials">
+      <div class="wrap">
+        <h2>What People Are Saying ⚓</h2>
+        <div class="testimonial-grid">
+          <blockquote>★★★★★<br>“Best clam chowder I’ve ever had. Worth every mile.”<cite>— Mike D., Providence</cite></blockquote>
+          <blockquote>★★★★★<br>“The clam cakes are out of this world. Crispy perfection.”<cite>— Sarah K., Newport</cite></blockquote>
+          <blockquote>★★★★☆<br>“A must-stop every time we’re down the shore.”<cite>— Tom B., Westerly</cite></blockquote>
+          <blockquote>★★★★★<br>“ChowdaQuest never misses. My go-to guide for RI seafood.”<cite>— Jess L., Cranston</cite></blockquote>
+        </div>
+      </div>
+    </section>
+
+    <section class="section feedback" id="feedback">
+      <div class="wrap feedback-grid">
+        <div class="panel">
+          <h2>Got Chowder Intel?</h2>
+          <p>Help Chowder Inspector keep this list honest.</p>
+          <form id="reviewForm">
+            <select id="reviewRestaurant"></select>
+            <select id="reviewCategory">
+              <option value="ri">Rhode Island Chowder</option>
+              <option value="ne">New England Chowder</option>
+              <option value="manhattan">Manhattan Chowder</option>
+              <option value="cakes">Clam Cakes</option>
+            </select>
+            <input id="reviewerName" placeholder="Your name or nickname" required />
+            <div class="sliders" id="sliders"></div>
+            <textarea id="reviewNotes" rows="4" placeholder="Your review. Be honest, Chowder can handle it."></textarea>
+            <button class="button primary full" type="submit">⚓ Submit Review</button>
+          </form>
+        </div>
+        <div class="panel">
+          <h2>Saved Prototype Feedback</h2>
+          <div id="savedFeedback"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <strong>ChowdaQuest</strong>
+        <p>Rhode ⚓ Island</p>
+      </div>
+      <p class="footer-quote">“The bowl never lies. Neither does Chowder.”</p>
+      <div>
+        <p>Local knowledge. Independent rankings. Rhode Island proud.</p>
+        <small>Prototype © ChowdaQuest</small>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
