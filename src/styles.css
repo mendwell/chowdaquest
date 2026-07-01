@@ -117,7 +117,7 @@ letter-spacing: normal;
   grid-template-columns: 1fr 1fr;
   background: var(--cream);
   border-bottom: 5px solid var(--navy);
-  padding: clamp(4rem, 8vw, 7rem) 1.5rem;
+  padding: clamp(4rem, 8vw, 7rem)  clamp(2rem, 5vw, 5rem);
 }
 
 .hero-art {
