@@ -82,7 +82,7 @@ letter-spacing: normal;
   color: #ff7b7b;
   font-style: normal;
   font-size: 13px;
-  font-weight: 950;
+  font-weight: 700;
   letter-spacing: normal;
   text-transform: uppercase;
 }
@@ -98,7 +98,7 @@ letter-spacing: normal;
   text-decoration: none;
   text-transform: uppercase;
   font-size: 14px;
-  font-weight: 950;
+  font-weight: 700;
 }
 
 .add-review {
@@ -107,7 +107,7 @@ letter-spacing: normal;
   background: var(--red);
   color: white;
   padding: 14px 18px;
-  font-weight: 950;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -230,7 +230,7 @@ main {
   color: #f8edd4;
   text-transform: uppercase;
   letter-spacing: normal;
-  font-weight: 950;
+  font-weight: 700;
 }
 
 .rank-grid {
@@ -312,7 +312,7 @@ letter-spacing: normal;
 
 .section-heading a {
   color: var(--red);
-  font-weight: 950;
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -375,7 +375,7 @@ letter-spacing: normal;
   color: rgba(7,20,38,.08);
   font-family: "Manrope", system-ui, sans-serif; letter-spacing: normal;
   font-size: 96px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .pin {
@@ -486,7 +486,7 @@ cite {
   font-family: Inter, sans-serif;
   font-size: 13px;
   font-style: normal;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .feedback-grid {
@@ -516,7 +516,7 @@ form {
   display: flex;
   justify-content: space-between;
   margin-bottom: 8px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 input[type="range"] {
