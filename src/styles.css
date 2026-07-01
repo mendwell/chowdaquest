@@ -83,7 +83,7 @@ letter-spacing: normal;
   font-style: normal;
   font-size: 13px;
   font-weight: 950;
-  letter-spacing: .24em;
+  letter-spacing: normal;
   text-transform: uppercase;
 }
 
@@ -161,7 +161,7 @@ h1 {
   color: #081326;
   font-size: clamp(58px, 8vw, 112px);
   line-height: .84;
-  letter-spacing: -.075em;
+  letter-spacing: normal;
 }
 
 .lede {
@@ -188,7 +188,7 @@ h1 {
   color: var(--navy);
   background: #fff8e8;
   text-decoration: none;
-  font-weight: 950;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -207,7 +207,7 @@ h1 {
   border-radius: 9px;
   color: #7f1d1d;
   background: #fff8e8;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 main {
@@ -228,7 +228,7 @@ main {
   background: var(--navy);
   color: #f8edd4;
   text-transform: uppercase;
-  letter-spacing: .12em;
+  letter-spacing: normal;
   font-weight: 950;
 }
 
