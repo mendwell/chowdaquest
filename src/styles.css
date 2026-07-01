@@ -72,10 +72,8 @@ img { max-width: 100%; }
 
 .brand strong {
   display: block;
-  font-family: Fraunces, serif;
-  font-size: clamp(29px, 4vw, 44px);
-  line-height: .82;
-  letter-spacing: -.055em;
+  font-family: "Manrope", system-ui, sans-serif;
+letter-spacing: normal;
 }
 
 .brand em {
@@ -154,7 +152,8 @@ img { max-width: 100%; }
 }
 
 h1, h2 {
-  font-family: Fraunces, serif;
+  font-family: "Manrope", system-ui, sans-serif;
+letter-spacing: normal;
 }
 
 h1 {
@@ -268,7 +267,8 @@ main {
 
 .rank-card h3 {
   margin: 0;
-  font-family: Fraunces, serif;
+ font-family: "Manrope", system-ui, sans-serif;
+letter-spacing: normal;
   font-size: 18px;
   line-height: 1.05;
 }
@@ -348,7 +348,8 @@ main {
 
 .drive-panel .quote {
   color: #8a241c;
-  font-family: Fraunces, serif;
+ font-family: "Manrope", system-ui, sans-serif;
+letter-spacing: normal;
   font-size: 22px;
   font-style: italic;
 }
@@ -371,7 +372,7 @@ main {
   left: 34%;
   top: 19%;
   color: rgba(7,20,38,.08);
-  font-family: Fraunces, serif;
+  font-family: "Manrope", system-ui, sans-serif; letter-spacing: normal;
   font-size: 96px;
   font-weight: 900;
 }
@@ -472,7 +473,7 @@ blockquote {
   background: #f3e4c6;
   box-shadow: var(--shadow);
   color: #8a241c;
-  font-family: Fraunces, serif;
+  font-family: "Manrope", system-ui, sans-serif; letter-spacing: normal;
   font-size: 19px;
   text-align: center;
 }
@@ -543,12 +544,12 @@ input[type="range"] {
 
 .site-footer strong {
   display: block;
-  font-family: Fraunces, serif;
+  font-family: "Manrope", system-ui, sans-serif; letter-spacing: normal;
   font-size: 30px;
 }
 
 .footer-quote {
-  font-family: Fraunces, serif;
+  font-family: "Manrope", system-ui, sans-serif; letter-spacing: normal;
   font-size: 24px;
   font-style: italic;
 }
