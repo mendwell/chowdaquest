@@ -117,7 +117,7 @@ letter-spacing: normal;
   grid-template-columns: 1fr 1fr;
   background: var(--cream);
   border-bottom: 5px solid var(--navy);
-  padding: clamp(4rem, 8vw, 7rem)  clamp(2rem, 5vw, 5rem);
+  padding-inline: clamp(3rem, 6vw, 6rem);
 }
 
 .hero-art {
@@ -127,13 +127,14 @@ letter-spacing: normal;
     url("../assets/chowder-hero.png");
   background-size: cover;
   background-position: center;
+  border-radius: 24px;
 }
 
 .hero-copy {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 58px max(30px, calc((100vw - 1240px) / 2)) 50px 40px;
+  padding: 4rem;
   background:
     radial-gradient(circle at 90% 8%, rgba(255, 255, 255, .48), transparent 18rem),
     #f3e4c6;
