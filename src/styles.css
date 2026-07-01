@@ -1,12 +1,39 @@
 :root {
   --navy: #071426;
-  --cream: #f3e4c6;
-  --paper: #ead6ad;
-  --ink: #0b1427;
-  --red: #a8271f;
-  --gold: #d2a53e;
-  --line: #9a7a48;
-  --shadow: 0 16px 38px rgba(20, 12, 0, .18);
+  --cream: #F8F1E5;
+  --sand: #EAD6AD;
+  --gold: #D2A53E;
+  --red: #A8271F;
+  --blue: #1D5B75;
+  --ink: #0B1427;
+  --muted: #5B6472;
+  --line: #D8C7A9;
+  --white: #FFFDF7;
+
+  --font-sans: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --page-max: 1200px;
+
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: clamp(4rem, 8vw, 7rem);
+
+  --gutter: clamp(1.5rem, 5vw, 5rem);
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --radius-pill: 999px;
+
+  --shadow-soft: 0 16px 40px rgba(7, 20, 38, 0.12);
+  --shadow-card: 0 8px 24px rgba(7, 20, 38, 0.10);
+
+  --border: 1px solid var(--line);
 }
 
 * { box-sizing: border-box; }
@@ -14,10 +41,9 @@
 html { scroll-behavior: smooth; }
 
 body {
-  margin: 0;
+ font-family: var(--font-sans);
   color: var(--ink);
-  background: #071426;
-  font-family: Inter, system-ui, sans-serif;
+  background: var(--cream);
 }
 
 img { max-width: 100%; }
@@ -117,7 +143,7 @@ letter-spacing: normal;
   grid-template-columns: 1fr 1fr;
   background: var(--cream);
   border-bottom: 5px solid var(--navy);
-  padding-inline: clamp(3rem, 6vw, 6rem);
+  padding-inline: var(--space-3xl) var(--gutter);
 }
 
 .hero-art {
@@ -134,10 +160,10 @@ letter-spacing: normal;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 4rem;
+  padding: var(--space-2xl); 
   background:
     radial-gradient(circle at 90% 8%, rgba(255, 255, 255, .48), transparent 18rem),
-    #f3e4c6;
+    var(--cream);
 }
 
 .stamp {
@@ -154,8 +180,10 @@ letter-spacing: normal;
 }
 
 h1, h2 {
-  font-family: "Manrope", system-ui, sans-serif;
-letter-spacing: normal;
+ font-family: var(--font-sans);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.015em;
 }
 
 h1 {
