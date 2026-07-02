@@ -1,3 +1,11 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const supabase = createClient(
+  "https://ztntlynbvjdwdimyxyde.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0bnRseW5idmpkd2RpbXl4eWRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2NjExNzIsImV4cCI6MjA5ODIzNzE3Mn0.p6pbSCfoVv9tXgABnN4-oJgno6NCH-VG3XSvqTqGJrQ
+"
+);
+
 import restaurants from "../data/restaurants.json" assert { type: "json" };
 
 const categories = {
@@ -155,6 +163,52 @@ function renderSliders() {
     });
   });
 }
+
+async function submitFirstBowlReview(event) {
+  event.preventDefault();
+
+  const form = event.target;
+  const formData = new FormData(form);
+
+  const { data: restaurant, error: restaurantError } = await supabase
+    .from("restaurants")
+    .select("id")
+    .eq("slug", "flos-middletown")
+    .single();
+
+  if (restaurantError) {
+    alert("Could not find Flo's in Supabase.");
+    console.error(restaurantError);
+    return;
+  }
+
+  const { error } = await supabase.from("reviews").insert({
+    restaurant_id: restaurant.id,
+    reviewer_name: formData.get("reviewer_name"),
+    category: "ri",
+    flavor: Number(formData.get("flavor")),
+    clam_quantity: Number(formData.get("clam_quantity")),
+    freshness: Number(formData.get("freshness")),
+    value_score: Number(formData.get("value_score")),
+    portion: Number(formData.get("portion")),
+    worth_the_drive: Number(formData.get("worth_the_drive")),
+    comments: formData.get("comments")
+  });
+
+  if (error) {
+    alert("Review failed to save.");
+    console.error(error);
+    return;
+  }
+
+  alert("First Bowl saved!");
+  form.reset();
+}
+
+document
+  .querySelector("#first-bowl-form")
+  ?.addEventListener("submit", submitFirstBowlReview);
+
 
 function renderSavedFeedback() {
   const feedback = getFeedback();
