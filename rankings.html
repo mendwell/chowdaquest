@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Live Rhode Island chowder rankings based on real ChowdaQuest community reviews." />
+  <title>Chowder Rankings | ChowdaQuest RI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/styles.css" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/chowder-favicon.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="./index.html" aria-label="ChowdaQuest home">
+        <span class="brand-seal"><img src="./assets/chowder-hero.png" alt="Chowder the cat" /></span>
+        <span><strong>ChowdaQuest</strong><em>Rhode ⚓ Island</em></span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="./rankings.html" aria-current="page">Rankings</a>
+        <a href="./index.html#explore">Explore</a>
+        <a href="./index.html#feedback">Add Review</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="rankings-main">
+    <section class="section rankings-hero">
+      <div class="wrap">
+        <p class="eyebrow">The bowl never lies</p>
+        <h1>Rhode Island Chowder Rankings</h1>
+        <p class="lede">Live standings calculated only from real community field reports.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap rankings-layout">
+        <div class="panel rankings-board">
+          <div class="rankings-controls" aria-label="Ranking filters">
+            <label for="rankingCategory">Category</label>
+            <select id="rankingCategory">
+              <option value="ri">Rhode Island Chowder</option>
+              <option value="ne">New England Chowder</option>
+              <option value="manhattan">Manhattan Chowder</option>
+              <option value="cakes">Clam Cakes</option>
+            </select>
+            <label for="rankingRegion">Region</label>
+            <select id="rankingRegion"><option value="">All Rhode Island</option></select>
+          </div>
+
+          <div id="rankingsStatus" class="rankings-status" role="status" aria-live="polite">Loading live standings…</div>
+          <div id="rankingsList" class="full-rankings-list"></div>
+        </div>
+
+        <aside class="panel methodology-card">
+          <p class="eyebrow">How it works</p>
+          <h2>Honest bowls only</h2>
+          <p>Restaurants enter the rankings after receiving at least one complete review in the selected category.</p>
+          <p>Each field report averages six measures: flavor, clam quantity, freshness, value, portion, and Worth The Drive™.</p>
+          <p>Unreviewed restaurants remain visible below the standings so inspectors know where reports are still needed.</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div><strong>ChowdaQuest</strong><p>Rhode ⚓ Island</p></div>
+      <p class="footer-quote">“Further investigation required.”</p>
+      <p>Local knowledge. Independent rankings. Rhode Island proud.</p>
+    </div>
+  </footer>
+
+  <script type="module" src="./src/rankings.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Restaurant ratings and Rhode Island chowder reviews from ChowdaQuest." />
+  <title>Restaurant Report | ChowdaQuest RI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/styles.css" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/chowder-favicon.png">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="./index.html" aria-label="ChowdaQuest home">
+        <span class="brand-seal"><img src="./assets/chowder-hero.png" alt="Chowder the cat" /></span>
+        <span><strong>ChowdaQuest</strong><em>Rhode ⚓ Island</em></span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="./rankings.html">Rankings</a>
+        <a href="./index.html#explore">Explore</a>
+        <a href="#review">Add Review</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="restaurant-detail-main">
+    <section class="section detail-hero">
+      <div class="wrap detail-hero-grid">
+        <div>
+          <a class="back-link" href="./index.html#explore">← All restaurants</a>
+          <p class="eyebrow">Captain Chowder’s field report</p>
+          <h1 id="detailName">Loading restaurant…</h1>
+          <p class="detail-location" id="detailLocation"></p>
+          <div class="detail-tags" id="detailTags"></div>
+        </div>
+        <aside class="detail-score-card" id="detailScore" aria-live="polite">
+          <p>Loading rating…</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap detail-content-grid">
+        <div class="panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Community reports</p>
+              <h2>Latest Reviews</h2>
+            </div>
+          </div>
+          <div class="review-list" id="detailReviews" aria-live="polite">
+            <p>Loading reviews…</p>
+          </div>
+        </div>
+
+        <aside class="panel" id="review">
+          <p class="eyebrow">Add your report</p>
+          <h2>Rate This Bowl</h2>
+          <form id="detailReviewForm">
+            <label for="detailReviewerName">Inspector name</label>
+            <input id="detailReviewerName" name="reviewer_name" placeholder="Your name or nickname" required />
+
+            <div class="sliders">
+              <div class="slider"><label for="detail-flavor"><span>Flavor</span><output>8</output></label><input id="detail-flavor" name="flavor" type="range" min="1" max="10" value="8" /></div>
+              <div class="slider"><label for="detail-clam_quantity"><span>Clam Quantity</span><output>8</output></label><input id="detail-clam_quantity" name="clam_quantity" type="range" min="1" max="10" value="8" /></div>
+              <div class="slider"><label for="detail-freshness"><span>Freshness</span><output>8</output></label><input id="detail-freshness" name="freshness" type="range" min="1" max="10" value="8" /></div>
+              <div class="slider"><label for="detail-value_score"><span>Value</span><output>8</output></label><input id="detail-value_score" name="value_score" type="range" min="1" max="10" value="8" /></div>
+              <div class="slider"><label for="detail-portion"><span>Portion</span><output>8</output></label><input id="detail-portion" name="portion" type="range" min="1" max="10" value="8" /></div>
+              <div class="slider"><label for="detail-worth_the_drive"><span>Worth The Drive</span><output>8</output></label><input id="detail-worth_the_drive" name="worth_the_drive" type="range" min="1" max="10" value="8" /></div>
+            </div>
+
+            <label for="detailComments">Review notes</label>
+            <textarea id="detailComments" name="comments" rows="4" placeholder="Be honest. Chowder can handle it."></textarea>
+            <button class="button primary full" type="submit">⚓ Submit Review</button>
+            <p id="detailReviewStatus" class="form-status" role="status" aria-live="polite"></p>
+          </form>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div><strong>ChowdaQuest</strong><p>Rhode ⚓ Island</p></div>
+      <p class="footer-quote">“The bowl never lies. Neither does Chowder.”</p>
+      <p>Local knowledge. Independent rankings. Rhode Island proud.</p>
+    </div>
+  </footer>
+
+  <script type="module" src="./src/restaurant.js"></script>
+</body>
+</html>

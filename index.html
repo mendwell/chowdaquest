@@ -26,7 +26,7 @@
       </a>
 
       <nav class="nav-links" aria-label="Primary navigation">
-        <a href="#rankings">Rankings</a>
+        <a href="./rankings.html">Rankings</a>
         <a href="#explore">Explore</a>
         <a href="#drive">Worth The Drive™</a>
         <a href="#feedback">Feedback</a>
@@ -34,36 +34,6 @@
       </nav>
     </div>
   </header>
-<section class="section">
-  <h2>Mission: First Bowl</h2>
-  <p>Submit a real Rhode Island chowder review for Flo's Clam Shack.</p>
-
-  <form id="first-bowl-form">
-    <input name="reviewer_name" placeholder="Your name" required>
-
-    <label>Flavor</label>
-    <input name="flavor" type="number" min="1" max="10" value="8" required>
-
-    <label>Clam Quantity</label>
-    <input name="clam_quantity" type="number" min="1" max="10" value="8" required>
-
-    <label>Freshness</label>
-    <input name="freshness" type="number" min="1" max="10" value="8" required>
-
-    <label>Value</label>
-    <input name="value_score" type="number" min="1" max="10" value="8" required>
-
-    <label>Portion</label>
-    <input name="portion" type="number" min="1" max="10" value="8" required>
-
-    <label>Worth the Drive</label>
-    <input name="worth_the_drive" type="number" min="1" max="10" value="8" required>
-
-    <textarea name="comments" placeholder="Review notes"></textarea>
-
-    <button type="submit">Submit First Bowl</button>
-  </form>
-</section>
   <main id="top">
     <section class="hero">
       <div class="hero-art" role="img" aria-label="Chowder the cat wearing a captain hat beside chowder and a lighthouse"></div>
@@ -72,10 +42,10 @@
         <h1>Further Investigation Required.</h1>
         <p class="lede">Finding Rhode Island’s best clam chowder and clam cakes, one bowl at a time.</p>
         <div class="hero-actions">
-          <a class="button primary" href="#rankings">⚓ Explore Rankings</a>
+          <a class="button primary" href="./rankings.html">⚓ Explore Rankings</a>
           <a class="button secondary" href="#explore">⌖ Find Restaurants</a>
         </div>
-        <p class="prototype-note">Feedback prototype: reviews save locally in this browser until Supabase is connected.</p>
+        <p class="prototype-note">Live community ratings, one honest bowl report at a time.</p>
       </div>
     </section>
 
@@ -156,25 +126,27 @@
       <div class="wrap feedback-grid">
         <div class="panel">
           <h2>Got Chowder Intel?</h2>
-          <p>Help Chowder Inspector keep this list honest.</p>
+          <p>File a real Rhode Island chowder report for Flo's Clam Shack.</p>
           <form id="reviewForm">
-            <select id="reviewRestaurant"></select>
-            <select id="reviewCategory">
-              <option value="ri">Rhode Island Chowder</option>
-              <option value="ne">New England Chowder</option>
-              <option value="manhattan">Manhattan Chowder</option>
-              <option value="cakes">Clam Cakes</option>
-            </select>
-            <input id="reviewerName" placeholder="Your name or nickname" required />
+            <label for="reviewRestaurant">Restaurant</label>
+            <select id="reviewRestaurant" disabled></select>
+            <p class="review-category">Rhode Island Clam Chowder</p>
+            <label for="reviewerName">Inspector name</label>
+            <input id="reviewerName" name="reviewer_name" placeholder="Your name or nickname" required />
             <div class="sliders" id="sliders"></div>
-            <textarea id="reviewNotes" rows="4" placeholder="Your review. Be honest, Chowder can handle it."></textarea>
+            <label for="reviewNotes">Review notes</label>
+            <textarea id="reviewNotes" name="comments" rows="4" placeholder="Be honest. Chowder can handle it."></textarea>
             <button class="button primary full" type="submit">⚓ Submit Review</button>
+            <p id="reviewStatus" class="form-status" role="status" aria-live="polite"></p>
           </form>
         </div>
-        <div class="panel">
-          <h2>Saved Prototype Feedback</h2>
-          <div id="savedFeedback"></div>
-        </div>
+        <aside class="panel">
+          <p class="eyebrow">Latest report</p>
+          <h2>Fresh from Supabase</h2>
+          <div id="latest-first-bowl" aria-live="polite">
+            <p>Loading the latest review…</p>
+          </div>
+        </aside>
       </div>
     </section>
   </main>
@@ -188,7 +160,7 @@
       <p class="footer-quote">“The bowl never lies. Neither does Chowder.”</p>
       <div>
         <p>Local knowledge. Independent rankings. Rhode Island proud.</p>
-        <small>Prototype © ChowdaQuest</small>
+        <small>© 2026 ChowdaQuest</small>
       </div>
     </div>
   </footer>
