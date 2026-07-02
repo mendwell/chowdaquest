@@ -5,8 +5,18 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0bnRseW5idmpkd2RpbXl4eWRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2NjExNzIsImV4cCI6MjA5ODIzNzE3Mn0.p6pbSCfoVv9tXgABnN4-oJgno6NCH-VG3XSvqTqGJrQ"
 );
 
-import restaurants from "../data/restaurants.json" assert { type: "json" };
-
+const restaurants = [
+  {
+    name: "Flo's Clam Shack",
+    slug: "flos-middletown",
+    town: "Middletown",
+    region: "Newport County",
+    has_ri_chowder: true,
+    has_ne_chowder: true,
+    has_manhattan_chowder: false,
+    has_clam_cakes: true
+  }
+];
 const categories = {
   ri: "RI Chowder",
   ne: "New England Chowder",
