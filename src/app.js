@@ -24,6 +24,19 @@ const categories = {
   cakes: "Clam Cakes"
 };
 
+const categoryFields = {
+  ri: ["ri", "has_ri_chowder"],
+  ne: ["ne", "has_ne_chowder"],
+  manhattan: ["manhattan", "has_manhattan_chowder"],
+  cakes: ["cakes", "has_clam_cakes"]
+};
+
+const BASELINE_WEIGHT = 5;
+
+function restaurantIcon(restaurant) {
+  return restaurant.icon?.trim() || "🥣";
+}
+
 const reviewDimensions = {
   ri: ["Flavor", "Clam Quantity", "Broth Quality", "Freshness", "Value", "Worth The Drive"],
   ne: ["Flavor", "Clam Quantity", "Creaminess", "Freshness", "Value", "Worth The Drive"],
@@ -53,7 +66,7 @@ function hash(value) {
 }
 
 function baseScore(restaurant, category) {
-  return Math.min(9.8, Math.max(4.1, 4.4 + (Math.abs(hash(restaurant.slug + category)) % 8) / 10));
+  return 6.5 + (Math.abs(hash(restaurant.slug + category)) % 30) / 10;
 }
 
 function getFeedback() {
@@ -69,21 +82,46 @@ function setFeedback(feedback) {
 }
 
 function score(restaurant, category) {
-  const feedback = getFeedback().filter((item) => item.slug === restaurant.slug && item.category === category);
-  if (!feedback.length) return baseScore(restaurant, category);
-  const feedbackAverage = feedback.reduce((sum, item) => sum + item.average, 0) / feedback.length;
-  return (baseScore(restaurant, category) * 3 + feedbackAverage * feedback.length) / (3 + feedback.length);
+  const feedback = getFeedback().filter(
+    (item) =>
+      item.slug === restaurant.slug &&
+      item.category === category &&
+      Number.isFinite(Number(item.average)) &&
+      Number(item.average) >= 1 &&
+      Number(item.average) <= 10
+  );
+  const feedbackTotal = feedback.reduce((sum, item) => sum + Number(item.average), 0);
+  const value = (baseScore(restaurant, category) * BASELINE_WEIGHT + feedbackTotal) / (BASELINE_WEIGHT + feedback.length);
+
+  return { value, reviewCount: feedback.length };
+}
+
+function ratingStars(value) {
+  const filled = Math.round(value / 2);
+  return `${"★".repeat(filled)}${"☆".repeat(5 - filled)}`;
+}
+
+function ratingMarkup(rating) {
+  const label = rating.reviewCount
+    ? `${rating.reviewCount} ${rating.reviewCount === 1 ? "review" : "reviews"}`
+    : "Provisional";
+
+  return `<div class="stars" aria-label="${rating.value.toFixed(1)} out of 10, ${label}">
+    <span aria-hidden="true">${ratingStars(rating.value)}</span>
+    <strong>${rating.value.toFixed(1)}/10</strong>
+    <small>· ${label}</small>
+  </div>`;
 }
 
 function restaurantServes(restaurant, category) {
-  return Boolean(restaurant[category]);
+  return categoryFields[category]?.some((field) => Boolean(restaurant[field])) ?? false;
 }
 
 function renderRankings() {
   const ranked = restaurants
     .filter((restaurant) => restaurantServes(restaurant, "ri"))
-    .map((restaurant) => ({ ...restaurant, currentScore: score(restaurant, "ri") }))
-    .sort((a, b) => b.currentScore - a.currentScore)
+    .map((restaurant) => ({ ...restaurant, rating: score(restaurant, "ri") }))
+    .sort((a, b) => b.rating.value - a.rating.value)
     .slice(0, 5);
 
   els.rankGrid.innerHTML = ranked
@@ -92,7 +130,7 @@ function renderRankings() {
         <span class="rank-number">${index + 1}</span>
         <h3>${restaurant.name}</h3>
         <p>${restaurant.town}<br>RI Clam Chowder</p>
-        <div class="stars">★★★★★ <small>(${178 + index * 41})</small></div>
+        ${ratingMarkup(restaurant.rating)}
       </article>
     `)
     .join("");
@@ -101,16 +139,19 @@ function renderRankings() {
 function renderFeatured() {
   els.featuredCards.innerHTML = restaurants
     .slice(0, 4)
-    .map((restaurant) => `
+    .map((restaurant) => {
+      const rating = score(restaurant, "ri");
+      return `
       <article class="restaurant-card">
-        <div class="restaurant-photo">${restaurant.icon}</div>
+        <div class="restaurant-photo" aria-hidden="true">${restaurantIcon(restaurant)}</div>
         <div class="restaurant-card-body">
           <h3>${restaurant.name}</h3>
           <p>${restaurant.town}, RI</p>
-          <div class="stars">★★★★☆ ${score(restaurant, "ri").toFixed(1)}</div>
+          ${ratingMarkup(rating)}
         </div>
       </article>
-    `)
+    `;
+    })
     .join("");
 }
 
@@ -141,8 +182,8 @@ function renderRestaurantList() {
     .map((restaurant) => `
       <article class="restaurant-row">
         <div>
-          <strong>${restaurant.icon} ${restaurant.name}</strong><br>
-          <small>${restaurant.town} · ${restaurant.region} · ${restaurant.status}</small>
+          <strong>${restaurantIcon(restaurant)} ${restaurant.name}</strong><br>
+          <small>${[restaurant.town, restaurant.region, restaurant.status || "Listing details pending"].filter(Boolean).join(" · ")}</small>
         </div>
         <div>
           ${Object.entries(categories)
