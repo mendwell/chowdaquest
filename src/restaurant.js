@@ -13,8 +13,9 @@ const MENU_FIELDS = [
   ["has_clam_cakes", "Clam Cakes"]
 ];
 const REVIEW_CATEGORIES = {
-  ri: { field: "has_ri_chowder", label: "Rhode Island Chowder" },
-  ne: { field: "has_ne_chowder", label: "New England Chowder" }
+  ri: { field: "has_ri_chowder", label: "Rhode Island Chowder", rateHeading: "Rate This Rhode Island Chowder" },
+  ne: { field: "has_ne_chowder", label: "New England Chowder", rateHeading: "Rate This New England Chowder" },
+  cakes: { field: "has_clam_cakes", label: "Clam Cakes", rateHeading: "Rate These Clam Cakes" }
 };
 
 const slug = new URLSearchParams(window.location.search).get("slug") || "flos-middletown";
@@ -111,9 +112,9 @@ function renderCategoryControl() {
 }
 
 function updateCategoryCopy() {
-  const label = REVIEW_CATEGORIES[activeCategory]?.label || "Chowder";
-  els.reviewsHeading.textContent = `Latest ${label} Reviews`;
-  els.reviewHeading.textContent = `Rate This ${label}`;
+  const category = REVIEW_CATEGORIES[activeCategory] || { label: "Chowder", rateHeading: "Rate This Bowl" };
+  els.reviewsHeading.textContent = `Latest ${category.label} Reviews`;
+  els.reviewHeading.textContent = category.rateHeading;
 }
 
 function renderRestaurant() {
