@@ -607,6 +607,18 @@ letter-spacing: normal;
   font-style: italic;
 }
 
+.review-preparation {
+  display: inline-block;
+  width: fit-content;
+  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+  background: #e8f1f5;
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .rankings-main {
   min-height: 72vh;
 }

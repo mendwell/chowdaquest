@@ -10,14 +10,16 @@ const categories = {
   ri: "RI Chowder",
   ne: "New England Chowder",
   manhattan: "Manhattan Chowder",
-  cakes: "Clam Cakes"
+  cakes: "Clam Cakes",
+  lobster: "Lobster Rolls"
 };
 
 const categoryFields = {
   ri: ["ri", "has_ri_chowder"],
   ne: ["ne", "has_ne_chowder"],
   manhattan: ["manhattan", "has_manhattan_chowder"],
-  cakes: ["cakes", "has_clam_cakes"]
+  cakes: ["cakes", "has_clam_cakes"],
+  lobster: ["lobster", "has_lobster_roll"]
 };
 
 const FIRST_BOWL_SLUG = "flos-middletown";
@@ -316,7 +318,7 @@ async function loadDirectory() {
   const [restaurantsResult, reviewsResult] = await Promise.all([
     supabase
       .from("restaurants")
-      .select("id, name, slug, town, region, verification_status, has_ri_chowder, has_ne_chowder, has_manhattan_chowder, has_clam_cakes")
+      .select("*")
       .order("name", { ascending: true }),
     supabase
       .from("reviews")

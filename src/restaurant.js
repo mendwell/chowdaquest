@@ -10,12 +10,18 @@ const MENU_FIELDS = [
   ["has_ri_chowder", "RI Chowder"],
   ["has_ne_chowder", "New England Chowder"],
   ["has_manhattan_chowder", "Manhattan Chowder"],
-  ["has_clam_cakes", "Clam Cakes"]
+  ["has_clam_cakes", "Clam Cakes"],
+  ["has_lobster_roll", "Lobster Rolls"]
 ];
 const REVIEW_CATEGORIES = {
   ri: { field: "has_ri_chowder", label: "Rhode Island Chowder", rateHeading: "Rate This Rhode Island Chowder" },
   ne: { field: "has_ne_chowder", label: "New England Chowder", rateHeading: "Rate This New England Chowder" },
-  cakes: { field: "has_clam_cakes", label: "Clam Cakes", rateHeading: "Rate These Clam Cakes" }
+  cakes: { field: "has_clam_cakes", label: "Clam Cakes", rateHeading: "Rate These Clam Cakes" },
+  lobster: { field: "has_lobster_roll", label: "Lobster Rolls", rateHeading: "Rate This Lobster Roll" }
+};
+const PREPARATION_LABELS = {
+  cold_mayo: "Cold with mayo",
+  hot_butter: "Hot with butter"
 };
 
 const slug = new URLSearchParams(window.location.search).get("slug") || "flos-middletown";
@@ -37,6 +43,9 @@ const els = {
   reviewPanel: document.querySelector("#review"),
   reviewHeading: document.querySelector("#detailReviewHeading"),
   form: document.querySelector("#detailReviewForm"),
+  preparationControl: document.querySelector("#detailPreparationControl"),
+  preparation: document.querySelector("#detailPreparation"),
+  quantityLabel: document.querySelector("#detailQuantityLabel"),
   status: document.querySelector("#detailReviewStatus")
 };
 
@@ -115,6 +124,11 @@ function updateCategoryCopy() {
   const category = REVIEW_CATEGORIES[activeCategory] || { label: "Chowder", rateHeading: "Rate This Bowl" };
   els.reviewsHeading.textContent = `Latest ${category.label} Reviews`;
   els.reviewHeading.textContent = category.rateHeading;
+  const isLobsterRoll = activeCategory === "lobster";
+  els.preparationControl.hidden = !isLobsterRoll;
+  els.preparation.disabled = !isLobsterRoll;
+  els.preparation.required = isLobsterRoll;
+  els.quantityLabel.textContent = isLobsterRoll ? "Lobster Quantity" : "Clam Quantity";
 }
 
 function renderRestaurant() {
@@ -218,7 +232,16 @@ function renderReviews(reviews) {
     score.className = "stars";
     score.textContent = average === null ? "Rating unavailable" : `${stars(average)} ${average.toFixed(1)}/10`;
 
-    card.append(heading, score);
+    card.append(heading);
+
+    if (review.preparation && PREPARATION_LABELS[review.preparation]) {
+      const preparation = document.createElement("span");
+      preparation.className = "review-preparation";
+      preparation.textContent = PREPARATION_LABELS[review.preparation];
+      card.append(preparation);
+    }
+
+    card.append(score);
 
     if (review.comments?.trim()) {
       const comments = document.createElement("blockquote");
@@ -233,7 +256,7 @@ function renderReviews(reviews) {
 async function loadReviews() {
   const { data, error } = await supabase
     .from("reviews")
-    .select("reviewer_name, flavor, clam_quantity, freshness, value_score, portion, worth_the_drive, comments, created_at")
+    .select("*")
     .eq("restaurant_id", restaurant.id)
     .eq("category", activeCategory)
     .order("created_at", { ascending: false });
@@ -280,7 +303,7 @@ async function submitReview(event) {
   button.disabled = true;
   setStatus("Saving your review…");
 
-  const { error } = await supabase.from("reviews").insert({
+  const review = {
     restaurant_id: restaurant.id,
     reviewer_name: formData.get("reviewer_name"),
     category: activeCategory,
@@ -291,7 +314,11 @@ async function submitReview(event) {
     portion: Number(formData.get("portion")),
     worth_the_drive: Number(formData.get("worth_the_drive")),
     comments: formData.get("comments")
-  });
+  };
+
+  if (activeCategory === "lobster") review.preparation = formData.get("preparation");
+
+  const { error } = await supabase.from("reviews").insert(review);
 
   if (error) {
     setStatus("Your review didn't save. Please try again.", "error");

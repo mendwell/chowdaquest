@@ -10,7 +10,8 @@ const CATEGORY_FIELDS = {
   ri: "has_ri_chowder",
   ne: "has_ne_chowder",
   manhattan: "has_manhattan_chowder",
-  cakes: "has_clam_cakes"
+  cakes: "has_clam_cakes",
+  lobster: "has_lobster_roll"
 };
 
 let restaurants = [];
@@ -157,7 +158,7 @@ async function loadRankings() {
   const [restaurantsResult, reviewsResult] = await Promise.all([
     supabase
       .from("restaurants")
-      .select("id, name, slug, town, region, has_ri_chowder, has_ne_chowder, has_manhattan_chowder, has_clam_cakes")
+      .select("*")
       .order("name", { ascending: true }),
     supabase
       .from("reviews")

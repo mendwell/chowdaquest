@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./src/styles.css" />
+  <link rel="stylesheet" href="./src/styles.css?v=20260707-lobster" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/chowder-favicon.png">
 </head>
 <body>
@@ -73,9 +73,17 @@
             <label for="detailReviewerName">Inspector name</label>
             <input id="detailReviewerName" name="reviewer_name" placeholder="Your name or nickname" required />
 
+            <div id="detailPreparationControl" hidden>
+              <label for="detailPreparation">Preparation</label>
+              <select id="detailPreparation" name="preparation" disabled>
+                <option value="cold_mayo">Cold with mayo</option>
+                <option value="hot_butter">Hot with butter</option>
+              </select>
+            </div>
+
             <div class="sliders">
               <div class="slider"><label for="detail-flavor"><span>Flavor</span><output>8</output></label><input id="detail-flavor" name="flavor" type="range" min="1" max="10" value="8" /></div>
-              <div class="slider"><label for="detail-clam_quantity"><span>Clam Quantity</span><output>8</output></label><input id="detail-clam_quantity" name="clam_quantity" type="range" min="1" max="10" value="8" /></div>
+              <div class="slider"><label for="detail-clam_quantity"><span id="detailQuantityLabel">Clam Quantity</span><output>8</output></label><input id="detail-clam_quantity" name="clam_quantity" type="range" min="1" max="10" value="8" /></div>
               <div class="slider"><label for="detail-freshness"><span>Freshness</span><output>8</output></label><input id="detail-freshness" name="freshness" type="range" min="1" max="10" value="8" /></div>
               <div class="slider"><label for="detail-value_score"><span>Value</span><output>8</output></label><input id="detail-value_score" name="value_score" type="range" min="1" max="10" value="8" /></div>
               <div class="slider"><label for="detail-portion"><span>Portion</span><output>8</output></label><input id="detail-portion" name="portion" type="range" min="1" max="10" value="8" /></div>
@@ -100,6 +108,6 @@
     </div>
   </footer>
 
-  <script type="module" src="./src/restaurant.js?v=20260707-cakes"></script>
+  <script type="module" src="./src/restaurant.js?v=20260707-lobster"></script>
 </body>
 </html>
