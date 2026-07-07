@@ -24,7 +24,9 @@ const categoryFields = {
 
 const FIRST_BOWL_SLUG = "flos-middletown";
 const FIRST_BOWL_SCORE_FIELDS = ["flavor", "clam_quantity", "freshness", "value_score", "portion", "worth_the_drive"];
+const NEW_RESTAURANT_VALUE = "__new_restaurant__";
 const liveRatings = new Map();
+const driveRatings = new Map();
 
 function restaurantIcon(restaurant) {
   return restaurant.icon?.trim() || "🥣";
@@ -58,13 +60,84 @@ const els = {
   searchButton: document.querySelector("#searchButton"),
   restaurantList: document.querySelector("#restaurantList"),
   reviewRestaurant: document.querySelector("#reviewRestaurant"),
+  reviewCategory: document.querySelector("#reviewCategory"),
+  preparationField: document.querySelector("#preparationField"),
+  reviewPreparation: document.querySelector("#reviewPreparation"),
+  newRestaurantFields: document.querySelector("#newRestaurantFields"),
+  suggestedRestaurantName: document.querySelector("#suggestedRestaurantName"),
+  suggestedRestaurantTown: document.querySelector("#suggestedRestaurantTown"),
+  suggestedRestaurantWebsite: document.querySelector("#suggestedRestaurantWebsite"),
   reviewForm: document.querySelector("#reviewForm"),
   reviewerName: document.querySelector("#reviewerName"),
   reviewNotes: document.querySelector("#reviewNotes"),
+  reviewSubmit: document.querySelector("#reviewSubmit"),
   sliders: document.querySelector("#sliders"),
   reviewStatus: document.querySelector("#reviewStatus"),
-  latestFirstBowl: document.querySelector("#latest-first-bowl")
+  latestFirstBowl: document.querySelector("#latest-first-bowl"),
+  driveMap: document.querySelector("#driveMap")
 };
+
+let driveMap;
+let driveMarkers;
+
+function renderDriveMap() {
+  if (!els.driveMap || typeof window.L === "undefined") return;
+
+  if (!driveMap) {
+    driveMap = window.L.map(els.driveMap, { scrollWheelZoom: false }).setView([41.58, -71.48], 9);
+    window.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(driveMap);
+    driveMarkers = window.L.featureGroup().addTo(driveMap);
+  }
+
+  driveMarkers.clearLayers();
+  const mappedRestaurants = restaurants.filter((restaurant) => {
+    if (restaurant.latitude === null || restaurant.longitude === null) return false;
+
+    const latitude = Number(restaurant.latitude);
+    const longitude = Number(restaurant.longitude);
+    return Number.isFinite(latitude) && Number.isFinite(longitude)
+      && latitude >= 41.1 && latitude <= 42.1
+      && longitude >= -72 && longitude <= -70.8;
+  });
+
+  mappedRestaurants.forEach((restaurant) => {
+    const driveRating = driveRatings.get(restaurant.id);
+    const link = document.createElement("a");
+    link.href = `./restaurant.html?slug=${encodeURIComponent(restaurant.slug)}`;
+    link.textContent = "View restaurant & reviews";
+
+    const name = document.createElement("strong");
+    name.textContent = restaurant.name;
+
+    const location = document.createElement("span");
+    location.textContent = `${restaurant.town}, RI`;
+
+    const rating = document.createElement("span");
+    rating.className = driveRating ? "drive-popup-rating" : "drive-popup-pending";
+    if (driveRating) {
+      const reviewLabel = `${driveRating.reviewCount} ${driveRating.reviewCount === 1 ? "review" : "reviews"}`;
+      rating.textContent = `Worth the Drive: ${driveRating.value.toFixed(1)}/10 · ${reviewLabel}`;
+      rating.setAttribute("aria-label", `Worth the Drive rating ${driveRating.value.toFixed(1)} out of 10 from ${reviewLabel}`);
+    } else {
+      rating.textContent = "Worth the Drive: Not yet rated";
+    }
+
+    const popup = document.createElement("div");
+    popup.className = "drive-popup";
+    popup.append(name, location, rating, link);
+
+    window.L.marker([Number(restaurant.latitude), Number(restaurant.longitude)])
+      .bindPopup(popup)
+      .addTo(driveMarkers);
+  });
+
+  if (mappedRestaurants.length) {
+    driveMap.fitBounds(driveMarkers.getBounds(), { padding: [24, 24], maxZoom: 12 });
+  }
+}
 
 function score(restaurant, category) {
   return liveRatings.get(`${restaurant.slug}:${category}`) ?? null;
@@ -142,10 +215,83 @@ function renderFeatured() {
 function renderRegions() {
   const regions = [...new Set(restaurants.map((restaurant) => restaurant.region))].sort();
   els.regionSelect.innerHTML = '<option value="">All Locations</option>' + regions.map((region) => `<option>${region}</option>`).join("");
-  const firstBowlRestaurant = restaurants.find((restaurant) => restaurant.slug === FIRST_BOWL_SLUG);
-  els.reviewRestaurant.innerHTML = firstBowlRestaurant
-    ? `<option value="${firstBowlRestaurant.slug}">${firstBowlRestaurant.name} — ${firstBowlRestaurant.town}</option>`
-    : '<option>Flo\'s Clam Shack — unavailable</option>';
+  els.reviewRestaurant.replaceChildren();
+
+  const prompt = document.createElement("option");
+  prompt.value = "";
+  prompt.textContent = "Choose a restaurant";
+  prompt.disabled = true;
+  prompt.selected = true;
+  els.reviewRestaurant.append(prompt);
+
+  restaurants.forEach((restaurant) => {
+    const option = document.createElement("option");
+    option.value = restaurant.slug;
+    option.textContent = `${restaurant.name} — ${restaurant.town}`;
+    els.reviewRestaurant.append(option);
+  });
+
+  const suggestion = document.createElement("option");
+  suggestion.value = NEW_RESTAURANT_VALUE;
+  suggestion.textContent = "Restaurant not listed — suggest one";
+  els.reviewRestaurant.append(suggestion);
+  updateReviewFormMode();
+}
+
+function populateReviewCategories(restaurant = null) {
+  const previousCategory = els.reviewCategory.value;
+  els.reviewCategory.replaceChildren();
+
+  const prompt = document.createElement("option");
+  prompt.value = "";
+  prompt.textContent = restaurant ? "Choose what you tried" : "Choose a category";
+  prompt.disabled = true;
+  prompt.selected = true;
+  els.reviewCategory.append(prompt);
+
+  Object.entries(categories).forEach(([key, label]) => {
+    if (restaurant && !restaurantServes(restaurant, key)) return;
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = label;
+    els.reviewCategory.append(option);
+  });
+
+  if ([...els.reviewCategory.options].some((option) => option.value === previousCategory)) {
+    els.reviewCategory.value = previousCategory;
+  }
+  updatePreparationField();
+}
+
+function updatePreparationField() {
+  const isLobster = els.reviewCategory.value === "lobster";
+  els.preparationField.hidden = !isLobster;
+  els.reviewPreparation.required = isLobster;
+  els.reviewPreparation.disabled = !isLobster;
+  if (!isLobster) els.reviewPreparation.value = "";
+}
+
+function updateReviewFormMode() {
+  const selectedSlug = els.reviewRestaurant.value;
+  const isSuggestion = selectedSlug === NEW_RESTAURANT_VALUE;
+  const restaurant = restaurants.find((item) => item.slug === selectedSlug) ?? null;
+
+  els.newRestaurantFields.hidden = !isSuggestion;
+  [els.suggestedRestaurantName, els.suggestedRestaurantTown].forEach((input) => {
+    input.required = isSuggestion;
+  });
+  [els.suggestedRestaurantName, els.suggestedRestaurantTown, els.suggestedRestaurantWebsite].forEach((input) => {
+    input.disabled = !isSuggestion;
+  });
+
+  els.sliders.hidden = isSuggestion;
+  els.sliders.querySelectorAll("input").forEach((input) => {
+    input.disabled = isSuggestion;
+  });
+
+  els.reviewSubmit.textContent = isSuggestion ? "⚓ Suggest Restaurant" : "⚓ Submit Review";
+
+  populateReviewCategories(isSuggestion ? null : restaurant);
 }
 
 function renderRestaurantList() {
@@ -203,25 +349,49 @@ function renderSliders() {
   });
 }
 
-async function submitFirstBowlReview(event) {
+async function submitReview(event) {
   event.preventDefault();
 
   const form = event.target;
   const formData = new FormData(form);
   const submitButton = form.querySelector("button[type='submit']");
 
+  const selectedSlug = String(formData.get("restaurant_slug") || "");
+  const category = String(formData.get("category") || "");
+  const isSuggestion = selectedSlug === NEW_RESTAURANT_VALUE;
+
   submitButton.disabled = true;
-  setReviewStatus("Saving your review…");
+  setReviewStatus(isSuggestion ? "Sending your restaurant suggestion…" : "Saving your review…");
 
-  const { data: restaurant, error: restaurantError } = await supabase
-    .from("restaurants")
-    .select("id")
-    .eq("slug", FIRST_BOWL_SLUG)
-    .single();
+  if (isSuggestion) {
+    const website = String(formData.get("suggested_restaurant_website") || "").trim();
+    const { error } = await supabase.from("restaurant_suggestions").insert({
+      name: String(formData.get("suggested_restaurant_name") || "").trim(),
+      town: String(formData.get("suggested_restaurant_town") || "").trim(),
+      website_url: website || null,
+      suggested_category: category,
+      suggested_by: String(formData.get("reviewer_name") || "").trim(),
+      notes: String(formData.get("comments") || "").trim() || null
+    });
 
-  if (restaurantError) {
-    setReviewStatus("We couldn't load Flo's. Please try again.", "error");
-    console.error(restaurantError);
+    if (error) {
+      setReviewStatus("That suggestion didn't save. Please try again.", "error");
+      console.error(error);
+      submitButton.disabled = false;
+      return;
+    }
+
+    form.reset();
+    renderSliders();
+    renderRegions();
+    submitButton.disabled = false;
+    setReviewStatus("Suggestion received! We’ll verify it before adding it publicly.", "success");
+    return;
+  }
+
+  const restaurant = restaurants.find((item) => item.slug === selectedSlug);
+  if (!restaurant || !restaurantServes(restaurant, category)) {
+    setReviewStatus("Choose a valid restaurant and category.", "error");
     submitButton.disabled = false;
     return;
   }
@@ -229,7 +399,8 @@ async function submitFirstBowlReview(event) {
   const { error } = await supabase.from("reviews").insert({
     restaurant_id: restaurant.id,
     reviewer_name: formData.get("reviewer_name"),
-    category: "ri",
+    category,
+    preparation: category === "lobster" ? formData.get("preparation") : null,
     flavor: Number(formData.get("flavor")),
     clam_quantity: Number(formData.get("clam_quantity")),
     freshness: Number(formData.get("freshness")),
@@ -248,6 +419,7 @@ async function submitFirstBowlReview(event) {
 
   form.reset();
   renderSliders();
+  renderRegions();
   submitButton.disabled = false;
   setReviewStatus("Review saved! Your report is now live.", "success");
   await loadDirectory();
@@ -341,12 +513,23 @@ async function loadDirectory() {
   const reviews = reviewsResult.data;
   const restaurantById = new Map(restaurants.map((restaurant) => [restaurant.id, restaurant]));
   const groupedScores = new Map();
+  const groupedDriveScores = new Map();
   liveRatings.clear();
+  driveRatings.clear();
 
   reviews.forEach((review) => {
     const restaurant = restaurantById.get(review.restaurant_id);
     const average = firstBowlAverage(review);
-    if (!restaurant || average === null || !review.category) return;
+    if (!restaurant) return;
+
+    const driveScore = Number(review.worth_the_drive);
+    if (Number.isFinite(driveScore) && driveScore >= 1 && driveScore <= 10) {
+      const driveScores = groupedDriveScores.get(restaurant.id) ?? [];
+      driveScores.push(driveScore);
+      groupedDriveScores.set(restaurant.id, driveScores);
+    }
+
+    if (average === null || !review.category) return;
 
     const key = `${restaurant.slug}:${review.category}`;
     const scores = groupedScores.get(key) ?? [];
@@ -361,6 +544,13 @@ async function loadDirectory() {
     });
   });
 
+  groupedDriveScores.forEach((scores, restaurantId) => {
+    driveRatings.set(restaurantId, {
+      value: scores.reduce((total, value) => total + value, 0) / scores.length,
+      reviewCount: scores.length
+    });
+  });
+
   const firstBowlRestaurant = restaurants.find((restaurant) => restaurant.slug === FIRST_BOWL_SLUG);
   const firstBowlReviews = firstBowlRestaurant
     ? reviews.filter((review) => review.restaurant_id === firstBowlRestaurant.id && review.category === "ri")
@@ -370,6 +560,7 @@ async function loadDirectory() {
   renderRankings();
   renderFeatured();
   renderRestaurantList();
+  renderDriveMap();
   renderLatestFirstBowlReview(firstBowlReviews[0] ?? null);
 }
 
@@ -401,7 +592,9 @@ function bindEvents() {
   });
 
   els.searchButton.addEventListener("click", renderRestaurantList);
-  els.reviewForm.addEventListener("submit", submitFirstBowlReview);
+  els.reviewRestaurant.addEventListener("change", updateReviewFormMode);
+  els.reviewCategory.addEventListener("change", updatePreparationField);
+  els.reviewForm.addEventListener("submit", submitReview);
 }
 
 renderSliders();

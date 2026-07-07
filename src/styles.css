@@ -759,43 +759,55 @@ letter-spacing: normal;
 }
 
 .ri-map {
-  position: relative;
   height: 280px;
   margin: 16px 0;
   overflow: hidden;
   border: 2px solid var(--line);
   border-radius: 10px;
-  background:
-    radial-gradient(circle at 30% 20%, #fff2cc, transparent 35%),
-    linear-gradient(135deg, #dfc99c, #f7ead0);
+  background: #dbe9df;
 }
 
-.ri-map::before {
-  content: "RI";
-  position: absolute;
-  left: 34%;
-  top: 19%;
-  color: rgba(7,20,38,.08);
-  font-family: "Manrope", system-ui, sans-serif; letter-spacing: normal;
-  font-size: 96px;
-  font-weight: 700;
+.ri-map .leaflet-popup-content {
+  margin: 12px 16px;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
-.pin {
-  position: absolute;
-  padding: 5px 8px;
-  border-radius: 8px;
-  color: white;
-  background: var(--navy);
-  font-size: 12px;
+.ri-map .leaflet-popup-content a {
+  color: var(--navy);
   font-weight: 900;
 }
 
-.providence { left: 54%; top: 22%; }
-.bristol { left: 36%; top: 42%; }
-.newport { left: 64%; top: 61%; }
-.narragansett { left: 51%; top: 75%; }
-.westerly { left: 18%; top: 74%; }
+.drive-popup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 12rem;
+  line-height: 1.35;
+}
+
+.drive-popup > * {
+  display: block;
+}
+
+.drive-popup strong {
+  color: var(--navy);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.drive-popup-rating {
+  color: var(--red);
+  font-weight: 800;
+}
+
+.drive-popup-pending {
+  color: #5d625f;
+  font-style: italic;
+}
+
+.drive-popup a {
+  margin-top: 0.15rem;
+}
 
 .filters {
   display: grid;
@@ -949,6 +961,32 @@ cite {
 form {
   display: grid;
   gap: 10px;
+}
+
+.new-restaurant-fields,
+#preparationField {
+  display: grid;
+  gap: 10px;
+}
+
+.new-restaurant-fields[hidden],
+#preparationField[hidden] {
+  display: none;
+}
+
+.form-hint {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 4px solid var(--red);
+  background: var(--white);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.new-restaurant-fields label span {
+  color: var(--muted);
+  font-size: 0.85em;
+  font-weight: 500;
 }
 
 .sliders {

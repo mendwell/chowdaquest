@@ -11,7 +11,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Inter:wght@500;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./src/styles.css?v=20260707-lobster" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="./src/styles.css?v=20260707-drive" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/chowder-favicon.png">
 </head>
 <body>
@@ -69,14 +70,8 @@
         <aside class="panel drive-panel" id="drive">
           <h2>Worth The Drive™</h2>
           <p class="quote">“Chowder worth crossing the bridge.”</p>
-          <div class="ri-map" aria-hidden="true">
-            <span class="pin providence">Providence</span>
-            <span class="pin bristol">Bristol</span>
-            <span class="pin newport">Newport</span>
-            <span class="pin narragansett">Narragansett</span>
-            <span class="pin westerly">Westerly</span>
-          </div>
-          <button class="button primary full" type="button">⚓ See All Destinations</button>
+          <div id="driveMap" class="ri-map" aria-label="Map of ChowdaQuest restaurants in Rhode Island"></div>
+          <button class="button primary full" type="button" data-scroll="#explore">⚓ See All Destinations</button>
         </aside>
       </div>
     </section>
@@ -127,23 +122,45 @@
       <div class="wrap feedback-grid">
         <div class="panel">
           <h2>Got Chowder Intel?</h2>
-          <p>File a real Rhode Island chowder report for Flo's Clam Shack.</p>
+          <p>Choose a restaurant and file a real Rhode Island field report.</p>
           <form id="reviewForm">
             <label for="reviewRestaurant">Restaurant</label>
-            <select id="reviewRestaurant" disabled></select>
-            <p class="review-category">Rhode Island Clam Chowder</p>
+            <select id="reviewRestaurant" name="restaurant_slug" required></select>
+
+            <div id="newRestaurantFields" class="new-restaurant-fields" hidden>
+              <p class="form-hint">Suggest it for verification. It won’t appear publicly until its details are checked.</p>
+              <label for="suggestedRestaurantName">Restaurant name</label>
+              <input id="suggestedRestaurantName" name="suggested_restaurant_name" maxlength="120" />
+              <label for="suggestedRestaurantTown">Rhode Island town</label>
+              <input id="suggestedRestaurantTown" name="suggested_restaurant_town" maxlength="80" />
+              <label for="suggestedRestaurantWebsite">Website <span>(optional)</span></label>
+              <input id="suggestedRestaurantWebsite" name="suggested_restaurant_website" type="url" maxlength="500" placeholder="https://" />
+            </div>
+
+            <label for="reviewCategory">What did you try?</label>
+            <select id="reviewCategory" name="category" required></select>
+
+            <div id="preparationField" hidden>
+              <label for="reviewPreparation">Lobster roll preparation</label>
+              <select id="reviewPreparation" name="preparation">
+                <option value="">Choose a preparation</option>
+                <option value="cold_mayo">Cold with mayo</option>
+                <option value="hot_butter">Hot with butter</option>
+              </select>
+            </div>
+
             <label for="reviewerName">Inspector name</label>
             <input id="reviewerName" name="reviewer_name" placeholder="Your name or nickname" required />
             <div class="sliders" id="sliders"></div>
             <label for="reviewNotes">Review notes</label>
             <textarea id="reviewNotes" name="comments" rows="4" placeholder="Be honest. Chowder can handle it."></textarea>
-            <button class="button primary full" type="submit">⚓ Submit Review</button>
+            <button class="button primary full" id="reviewSubmit" type="submit">⚓ Submit Review</button>
             <p id="reviewStatus" class="form-status" role="status" aria-live="polite"></p>
           </form>
         </div>
         <aside class="panel">
           <p class="eyebrow">Latest report</p>
-          <h2>Fresh from Supabase</h2>
+          <h2>Latest Field Report</h2>
           <div id="latest-first-bowl" aria-live="polite">
             <p>Loading the latest review…</p>
           </div>
@@ -166,6 +183,7 @@
     </div>
   </footer>
 
-  <script type="module" src="./src/app.js?v=20260707-lobster"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script type="module" src="./src/app.js?v=20260707-review-form"></script>
 </body>
 </html>
