@@ -29,12 +29,22 @@
   <main class="restaurant-detail-main">
     <section class="section detail-hero">
       <div class="wrap detail-hero-grid">
+        <figure class="detail-photo" id="detailPhoto">
+          <img src="./assets/chowder-hero.png" alt="Captain Chowder placeholder artwork" />
+          <figcaption>Restaurant photo pending permission</figcaption>
+        </figure>
         <div>
           <a class="back-link" href="./index.html#explore">← All restaurants</a>
           <p class="eyebrow">Captain Chowder’s field report</p>
           <h1 id="detailName">Loading restaurant…</h1>
           <p class="detail-location" id="detailLocation"></p>
+          <div class="verified-badge" id="detailVerification" hidden></div>
           <div class="detail-tags" id="detailTags"></div>
+          <div class="detail-category-control" id="detailCategoryControl" hidden>
+            <label for="detailCategory">Bowl style</label>
+            <select id="detailCategory"></select>
+          </div>
+          <dl class="restaurant-facts" id="detailFacts"></dl>
         </div>
         <aside class="detail-score-card" id="detailScore" aria-live="polite">
           <p>Loading rating…</p>
@@ -48,7 +58,7 @@
           <div class="section-heading">
             <div>
               <p class="eyebrow">Community reports</p>
-              <h2>Latest Reviews</h2>
+              <h2 id="detailReviewsHeading">Latest Reviews</h2>
             </div>
           </div>
           <div class="review-list" id="detailReviews" aria-live="polite">
@@ -58,7 +68,7 @@
 
         <aside class="panel" id="review">
           <p class="eyebrow">Add your report</p>
-          <h2>Rate This Bowl</h2>
+          <h2 id="detailReviewHeading">Rate This Bowl</h2>
           <form id="detailReviewForm">
             <label for="detailReviewerName">Inspector name</label>
             <input id="detailReviewerName" name="reviewer_name" placeholder="Your name or nickname" required />
@@ -90,6 +100,6 @@
     </div>
   </footer>
 
-  <script type="module" src="./src/restaurant.js"></script>
+  <script type="module" src="./src/restaurant.js?v=20260707-ne"></script>
 </body>
 </html>

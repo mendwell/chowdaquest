@@ -28,6 +28,16 @@ function restaurantIcon(restaurant) {
   return restaurant.icon?.trim() || "🥣";
 }
 
+function verificationLabel(restaurant) {
+  const labels = {
+    verified: "✓ Verified",
+    needs_update: "⚑ Needs confirmation",
+    unverified: "Unverified"
+  };
+
+  return labels[restaurant.verification_status] || labels.unverified;
+}
+
 const reviewDimensions = [
   { name: "flavor", label: "Flavor" },
   { name: "clam_quantity", label: "Clam Quantity" },
@@ -142,7 +152,7 @@ function renderRestaurantList() {
   const category = els.categorySelect.value;
 
   const filtered = restaurants.filter((restaurant) => {
-    const matchesSearch = [restaurant.name, restaurant.town, restaurant.region, restaurant.status]
+    const matchesSearch = [restaurant.name, restaurant.town, restaurant.region, verificationLabel(restaurant)]
       .join(" ")
       .toLowerCase()
       .includes(search);
@@ -161,7 +171,7 @@ function renderRestaurantList() {
       <article class="restaurant-row">
         <div>
           <strong>${restaurantIcon(restaurant)} <a class="restaurant-link" href="./restaurant.html?slug=${encodeURIComponent(restaurant.slug)}">${restaurant.name}</a></strong><br>
-          <small>${[restaurant.town, restaurant.region, restaurant.status || "Listing details pending"].filter(Boolean).join(" · ")}</small>
+          <small>${[restaurant.town, restaurant.region, verificationLabel(restaurant)].join(" · ")}</small>
         </div>
         <div>
           ${Object.entries(categories)
@@ -306,7 +316,7 @@ async function loadDirectory() {
   const [restaurantsResult, reviewsResult] = await Promise.all([
     supabase
       .from("restaurants")
-      .select("id, name, slug, town, region, has_ri_chowder, has_ne_chowder, has_manhattan_chowder, has_clam_cakes")
+      .select("id, name, slug, town, region, verification_status, has_ri_chowder, has_ne_chowder, has_manhattan_chowder, has_clam_cakes")
       .order("name", { ascending: true }),
     supabase
       .from("reviews")

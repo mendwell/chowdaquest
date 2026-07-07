@@ -420,10 +420,33 @@ letter-spacing: normal;
 
 .detail-hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
+  grid-template-columns: minmax(220px, 320px) minmax(0, 1fr) minmax(260px, 340px);
   align-items: end;
   gap: var(--space-xl);
   padding-block: var(--space-2xl);
+}
+
+.detail-photo {
+  margin: 0;
+  overflow: hidden;
+  border: 2px solid #b99c65;
+  border-radius: 14px;
+  background: var(--white);
+  box-shadow: var(--shadow-card);
+}
+
+.detail-photo img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  display: block;
+  object-fit: cover;
+}
+
+.detail-photo figcaption {
+  padding: 9px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .detail-hero h1 {
@@ -450,6 +473,78 @@ letter-spacing: normal;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.detail-category-control {
+  width: min(100%, 320px);
+  margin-top: 18px;
+}
+
+.detail-category-control label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.detail-category-control select {
+  width: 100%;
+  padding: 11px 38px 11px 12px;
+  border: 2px solid #b99c65;
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--navy);
+  font: inherit;
+  font-weight: 800;
+}
+
+.verified-badge {
+  width: fit-content;
+  margin: 10px 0;
+  padding: 6px 10px;
+  border: 1px solid #4d7b59;
+  border-radius: var(--radius-pill);
+  background: #e9f4e8;
+  color: #28623b;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.verified-badge[data-status="needs_update"] {
+  border-color: #b27b22;
+  background: #fff4d8;
+  color: #754b08;
+}
+
+.verified-badge[data-status="unverified"] {
+  border-color: #9a9388;
+  background: #f2efe9;
+  color: #5e584f;
+}
+
+.restaurant-facts {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 7px 12px;
+  margin: 20px 0 0;
+}
+
+.restaurant-facts dt {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.restaurant-facts dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.restaurant-facts a {
+  color: var(--navy);
+  text-underline-offset: 3px;
 }
 
 .detail-score-card {

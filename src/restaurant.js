@@ -12,17 +12,29 @@ const MENU_FIELDS = [
   ["has_manhattan_chowder", "Manhattan Chowder"],
   ["has_clam_cakes", "Clam Cakes"]
 ];
+const REVIEW_CATEGORIES = {
+  ri: { field: "has_ri_chowder", label: "Rhode Island Chowder" },
+  ne: { field: "has_ne_chowder", label: "New England Chowder" }
+};
 
 const slug = new URLSearchParams(window.location.search).get("slug") || "flos-middletown";
 let restaurant;
+let activeCategory = "ri";
 
 const els = {
   name: document.querySelector("#detailName"),
   location: document.querySelector("#detailLocation"),
+  photo: document.querySelector("#detailPhoto"),
+  verification: document.querySelector("#detailVerification"),
   tags: document.querySelector("#detailTags"),
+  categoryControl: document.querySelector("#detailCategoryControl"),
+  category: document.querySelector("#detailCategory"),
+  facts: document.querySelector("#detailFacts"),
   score: document.querySelector("#detailScore"),
   reviews: document.querySelector("#detailReviews"),
+  reviewsHeading: document.querySelector("#detailReviewsHeading"),
   reviewPanel: document.querySelector("#review"),
+  reviewHeading: document.querySelector("#detailReviewHeading"),
   form: document.querySelector("#detailReviewForm"),
   status: document.querySelector("#detailReviewStatus")
 };
@@ -51,11 +63,87 @@ function setStatus(message, state = "") {
   else delete els.status.dataset.state;
 }
 
+function addFact(label, value, href) {
+  if (!value) return;
+  const term = document.createElement("dt");
+  term.textContent = label;
+  const description = document.createElement("dd");
+
+  if (href) {
+    const link = document.createElement("a");
+    link.href = href;
+    link.textContent = value;
+    if (href.startsWith("http")) {
+      link.target = "_blank";
+      link.rel = "noreferrer";
+    }
+    description.append(link);
+  } else {
+    description.textContent = value;
+  }
+
+  els.facts.append(term, description);
+}
+
+function availableReviewCategories() {
+  return Object.entries(REVIEW_CATEGORIES).filter(([, category]) => restaurant[category.field]);
+}
+
+function renderCategoryControl() {
+  const categories = availableReviewCategories();
+  els.category.replaceChildren();
+
+  categories.forEach(([value, category]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = category.label;
+    els.category.append(option);
+  });
+
+  const requestedCategory = new URLSearchParams(window.location.search).get("category");
+  activeCategory = categories.some(([value]) => value === requestedCategory)
+    ? requestedCategory
+    : categories[0]?.[0] || "ri";
+  els.category.value = activeCategory;
+  els.categoryControl.hidden = !categories.length;
+  els.reviewPanel.hidden = !categories.length;
+  updateCategoryCopy();
+}
+
+function updateCategoryCopy() {
+  const label = REVIEW_CATEGORIES[activeCategory]?.label || "Chowder";
+  els.reviewsHeading.textContent = `Latest ${label} Reviews`;
+  els.reviewHeading.textContent = `Rate This ${label}`;
+}
+
 function renderRestaurant() {
   document.title = `${restaurant.name} | ChowdaQuest RI`;
   els.name.textContent = restaurant.name;
   els.location.textContent = `${restaurant.town} · ${restaurant.region}`;
   els.tags.replaceChildren();
+  els.facts.replaceChildren();
+
+  const photo = els.photo.querySelector("img");
+  const credit = els.photo.querySelector("figcaption");
+  if (restaurant.photo_url) {
+    photo.src = restaurant.photo_url;
+    photo.alt = restaurant.photo_alt || `Exterior of ${restaurant.name}`;
+    credit.textContent = restaurant.photo_credit || "Restaurant photo";
+  } else {
+    photo.src = "./assets/chowder-hero.png";
+    photo.alt = "Captain Chowder placeholder artwork";
+    credit.textContent = "Restaurant photo pending permission";
+  }
+
+  const verificationLabels = {
+    verified: "✓ Official details verified",
+    needs_update: "⚑ Listing needs confirmation",
+    unverified: "Listing not yet verified"
+  };
+  const verificationStatus = restaurant.verification_status || "unverified";
+  els.verification.hidden = false;
+  els.verification.dataset.status = verificationStatus;
+  els.verification.textContent = verificationLabels[verificationStatus] || verificationLabels.unverified;
 
   MENU_FIELDS.filter(([field]) => restaurant[field]).forEach(([, label]) => {
     const tag = document.createElement("span");
@@ -64,7 +152,15 @@ function renderRestaurant() {
     els.tags.append(tag);
   });
 
-  els.reviewPanel.hidden = !restaurant.has_ri_chowder;
+  addFact("Address", restaurant.address);
+  addFact("Phone", restaurant.phone, restaurant.phone ? `tel:${restaurant.phone.replace(/[^\d+]/g, "")}` : null);
+  addFact("Hours", restaurant.hours_summary);
+  addFact("Official website", restaurant.website_url ? "Visit website ↗" : null, restaurant.website_url);
+  addFact("Official menu", restaurant.menu_url ? "View current menu ↗" : null, restaurant.menu_url);
+  addFact("Verification source", restaurant.verified_source_url ? "View official source ↗" : null, restaurant.verified_source_url);
+  addFact("Verification notes", restaurant.verification_notes);
+
+  renderCategoryControl();
 }
 
 function renderScore(reviews) {
@@ -73,11 +169,9 @@ function renderScore(reviews) {
 
   if (!reviewScores.length) {
     const heading = document.createElement("strong");
-    heading.textContent = restaurant.has_ri_chowder ? "Not rated yet" : "No RI chowder listed";
+    heading.textContent = "Not rated yet";
     const copy = document.createElement("p");
-    copy.textContent = restaurant.has_ri_chowder
-      ? "Be the first inspector to file a report."
-      : "Reviews for other chowder styles are coming next.";
+    copy.textContent = `Be the first inspector to rate the ${REVIEW_CATEGORIES[activeCategory].label.toLowerCase()}.`;
     els.score.append(heading, copy);
     return;
   }
@@ -140,7 +234,7 @@ async function loadReviews() {
     .from("reviews")
     .select("reviewer_name, flavor, clam_quantity, freshness, value_score, portion, worth_the_drive, comments, created_at")
     .eq("restaurant_id", restaurant.id)
-    .eq("category", "ri")
+    .eq("category", activeCategory)
     .order("created_at", { ascending: false });
 
   if (error) throw error;
@@ -151,7 +245,7 @@ async function loadReviews() {
 async function loadPage() {
   const { data, error } = await supabase
     .from("restaurants")
-    .select("id, name, slug, town, region, has_ri_chowder, has_ne_chowder, has_manhattan_chowder, has_clam_cakes")
+    .select("*")
     .eq("slug", slug)
     .single();
 
@@ -188,7 +282,7 @@ async function submitReview(event) {
   const { error } = await supabase.from("reviews").insert({
     restaurant_id: restaurant.id,
     reviewer_name: formData.get("reviewer_name"),
-    category: "ri",
+    category: activeCategory,
     flavor: Number(formData.get("flavor")),
     clam_quantity: Number(formData.get("clam_quantity")),
     freshness: Number(formData.get("freshness")),
@@ -219,4 +313,19 @@ els.form.querySelectorAll("input[type='range']").forEach((input) => {
 });
 
 els.form.addEventListener("submit", submitReview);
+els.category.addEventListener("change", async () => {
+  activeCategory = els.category.value;
+  updateCategoryCopy();
+  setStatus("");
+  els.score.innerHTML = "<p>Loading rating…</p>";
+  els.reviews.innerHTML = "<p>Loading reviews…</p>";
+
+  try {
+    await loadReviews();
+  } catch (error) {
+    els.score.textContent = "Rating unavailable.";
+    els.reviews.textContent = "Reviews unavailable right now.";
+    console.error(error);
+  }
+});
 loadPage();
