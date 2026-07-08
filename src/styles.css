@@ -6,7 +6,7 @@
   --red: #A8271F;
   --blue: #1D5B75;
   --ink: #0B1427;
-  --muted: #5B6472;
+  --muted: #46505F;
   --line: #D8C7A9;
   --white: #FFFDF7;
 
@@ -47,6 +47,24 @@ body {
 }
 
 img { max-width: 100%; }
+
+:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--navy);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 .wrap {
   width: min(1240px, calc(100% - 28px));
@@ -522,11 +540,19 @@ letter-spacing: normal;
 }
 
 .category-summary-card:hover,
-.category-summary-card:focus-visible,
 .category-summary-card[aria-pressed="true"] {
   border-color: var(--red);
-  outline: none;
   box-shadow: 0 0 0 3px rgba(166, 39, 31, .15);
+}
+
+.category-summary-card:focus-visible {
+  border-color: var(--red);
+  outline: 3px solid #fff;
+  box-shadow: 0 0 0 6px var(--navy);
+}
+
+.leaflet-control-attribution a {
+  color: #004f6b;
 }
 
 .category-summary-card strong {
@@ -942,6 +968,18 @@ letter-spacing: normal;
   gap: 10px;
 }
 
+.filter-field {
+  display: grid;
+  gap: 6px;
+  color: var(--navy);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.filters > .button {
+  align-self: end;
+}
+
 input, select, textarea {
   width: 100%;
   padding: 12px;
@@ -1214,8 +1252,25 @@ input[type="range"] {
 }
 
 @media (max-width: 980px) {
-  .nav-links { display: none; }
-  .hero { grid-template-columns: 1fr; }
+  .nav {
+    flex-wrap: wrap;
+    padding-block: 10px;
+  }
+  .nav-links {
+    display: flex;
+    width: 100%;
+    padding-bottom: 4px;
+    gap: 18px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+  }
+  .nav-links a,
+  .nav-links button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+  .hero { grid-template-columns: minmax(0, 1fr); }
   .hero-art {
     min-height: 420px;
     order: -1;
@@ -1234,7 +1289,11 @@ input[type="range"] {
   .feedback-grid,
   .rankings-layout,
   .footer-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .panel,
+  .drive-panel {
+    min-width: 0;
   }
   .rankings-controls {
     grid-template-columns: 1fr 1fr;
@@ -1247,17 +1306,49 @@ input[type="range"] {
 
 @media (max-width: 600px) {
   .nav { min-height: 74px; }
+  .nav-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 12px;
+    overflow: visible;
+  }
+  .nav-links a,
+  .nav-links button {
+    justify-self: center;
+    white-space: normal;
+    text-align: center;
+  }
+  .nav-links a {
+    font-size: 12px;
+  }
+  .nav-links .add-review {
+    padding: 10px 14px;
+  }
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
   .brand-seal { width: 52px; height: 52px; }
   .brand strong { font-size: 30px; }
-  .brand em { font-size: 10px; }
+  .brand em { font-size: 12px; }
   .rankings-controls,
   .full-ranking-row,
   .awaiting-row {
     grid-template-columns: 1fr;
   }
   .ranking-score { justify-items: start; }
+  .hero {
+    padding-inline: 14px;
+  }
   .hero-art { min-height: 320px; }
-  h1 { font-size: 58px; }
+  .hero-copy {
+    min-width: 0;
+    padding-inline: 4px;
+  }
+  h1 {
+    font-size: clamp(42px, 13vw, 58px);
+    overflow-wrap: anywhere;
+  }
   .rank-grid,
   .restaurant-cards,
   .recent-review-grid {

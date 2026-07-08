@@ -144,7 +144,10 @@ function renderDriveMap() {
     popup.className = "drive-popup";
     popup.append(name, location, rating, link);
 
-    window.L.marker([Number(restaurant.latitude), Number(restaurant.longitude)])
+    window.L.marker([Number(restaurant.latitude), Number(restaurant.longitude)], {
+      alt: restaurant.name,
+      title: restaurant.name
+    })
       .bindPopup(popup)
       .addTo(driveMarkers);
   });
