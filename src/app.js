@@ -22,11 +22,15 @@ const categoryFields = {
   lobster: ["lobster", "has_lobster_roll"]
 };
 
-const FIRST_BOWL_SLUG = "flos-middletown";
-const FIRST_BOWL_SCORE_FIELDS = ["flavor", "clam_quantity", "freshness", "value_score", "portion", "worth_the_drive"];
+const REVIEW_SCORE_FIELDS = ["flavor", "clam_quantity", "freshness", "value_score", "portion", "worth_the_drive"];
 const NEW_RESTAURANT_VALUE = "__new_restaurant__";
 const liveRatings = new Map();
 const driveRatings = new Map();
+
+const preparationLabels = {
+  cold_mayo: "Cold with mayo",
+  hot_butter: "Hot with butter"
+};
 
 function restaurantIcon(restaurant) {
   return restaurant.icon?.trim() || "🥣";
@@ -48,7 +52,7 @@ const reviewDimensions = [
   { name: "freshness", label: "Freshness" },
   { name: "value_score", label: "Value" },
   { name: "portion", label: "Portion" },
-  { name: "worth_the_drive", label: "Worth The Drive" }
+  { name: "worth_the_drive", label: "Cross the Bridge Score" }
 ];
 
 const els = {
@@ -73,7 +77,8 @@ const els = {
   reviewSubmit: document.querySelector("#reviewSubmit"),
   sliders: document.querySelector("#sliders"),
   reviewStatus: document.querySelector("#reviewStatus"),
-  latestFirstBowl: document.querySelector("#latest-first-bowl"),
+  latestReview: document.querySelector("#latest-review"),
+  recentReviews: document.querySelector("#recentReviews"),
   driveMap: document.querySelector("#driveMap")
 };
 
@@ -119,10 +124,10 @@ function renderDriveMap() {
     rating.className = driveRating ? "drive-popup-rating" : "drive-popup-pending";
     if (driveRating) {
       const reviewLabel = `${driveRating.reviewCount} ${driveRating.reviewCount === 1 ? "review" : "reviews"}`;
-      rating.textContent = `Worth the Drive: ${driveRating.value.toFixed(1)}/10 · ${reviewLabel}`;
-      rating.setAttribute("aria-label", `Worth the Drive rating ${driveRating.value.toFixed(1)} out of 10 from ${reviewLabel}`);
+      rating.textContent = `Cross the Bridge Score: ${driveRating.value.toFixed(1)}/10 · ${reviewLabel}`;
+      rating.setAttribute("aria-label", `Cross the Bridge Score ${driveRating.value.toFixed(1)} out of 10 from ${reviewLabel}`);
     } else {
-      rating.textContent = "Worth the Drive: Not yet rated";
+      rating.textContent = "Cross the Bridge Score: Not yet rated";
     }
 
     const popup = document.createElement("div");
@@ -434,28 +439,37 @@ function setReviewStatus(message, state = "") {
   }
 }
 
-function firstBowlAverage(review) {
-  const scores = FIRST_BOWL_SCORE_FIELDS
+function reviewAverage(review) {
+  const scores = REVIEW_SCORE_FIELDS
     .filter((field) => review[field] !== null && review[field] !== undefined)
     .map((field) => Number(review[field]))
     .filter((value) => Number.isFinite(value) && value >= 1 && value <= 10);
   return scores.length ? scores.reduce((total, value) => total + value, 0) / scores.length : null;
 }
 
-function renderLatestFirstBowlReview(review) {
-  els.latestFirstBowl.replaceChildren();
+function reviewDetailParts(review, restaurant) {
+  const detailParts = [categories[review.category] || "Review"];
+  if (review.category === "lobster" && preparationLabels[review.preparation]) {
+    detailParts.push(preparationLabels[review.preparation]);
+  }
+  if (restaurant?.town) detailParts.push(`${restaurant.town}, RI`);
+  return detailParts;
+}
 
-  if (!review) {
+function renderLatestReview(review, restaurant) {
+  els.latestReview.replaceChildren();
+
+  if (!review || !restaurant) {
     const empty = document.createElement("p");
-    empty.textContent = "No First Bowl reviews yet. Be the first inspector to file a report.";
-    els.latestFirstBowl.append(empty);
+    empty.textContent = "No field reports yet. Be the first inspector to file one.";
+    els.latestReview.append(empty);
     return;
   }
 
   const card = document.createElement("article");
   card.className = "latest-review";
 
-  const average = firstBowlAverage(review);
+  const average = reviewAverage(review);
   if (average !== null) {
     const score = document.createElement("p");
     score.className = "latest-review-score";
@@ -463,6 +477,18 @@ function renderLatestFirstBowlReview(review) {
     score.setAttribute("aria-label", `${average.toFixed(1)} out of 10`);
     card.append(score);
   }
+
+  const heading = document.createElement("h3");
+  const link = document.createElement("a");
+  link.href = `./restaurant.html?slug=${encodeURIComponent(restaurant.slug)}${review.category ? `&category=${encodeURIComponent(review.category)}` : ""}`;
+  link.textContent = restaurant.name;
+  heading.append(link);
+  card.append(heading);
+
+  const details = document.createElement("p");
+  details.className = "latest-review-details";
+  details.textContent = reviewDetailParts(review, restaurant).join(" · ");
+  card.append(details);
 
   const byline = document.createElement("strong");
   byline.textContent = review.reviewer_name || "Anonymous inspector";
@@ -480,7 +506,62 @@ function renderLatestFirstBowlReview(review) {
     card.append(notes);
   }
 
-  els.latestFirstBowl.append(card);
+  els.latestReview.append(card);
+}
+
+function renderRecentReviews(reviews, restaurantById) {
+  els.recentReviews.replaceChildren();
+
+  const recentReviews = reviews
+    .filter((review) => restaurantById.has(review.restaurant_id))
+    .slice(0, 4);
+
+  if (!recentReviews.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty-state";
+    empty.textContent = "Recent reviews will appear here once inspectors file their reports.";
+    els.recentReviews.append(empty);
+    return;
+  }
+
+  recentReviews.forEach((review) => {
+    const restaurant = restaurantById.get(review.restaurant_id);
+    const card = document.createElement("article");
+    card.className = "recent-review-card";
+
+    const average = reviewAverage(review);
+    if (average !== null) {
+      const score = document.createElement("p");
+      score.className = "recent-review-score";
+      score.textContent = `${ratingStars(average)} ${average.toFixed(1)}/10`;
+      score.setAttribute("aria-label", `${average.toFixed(1)} out of 10`);
+      card.append(score);
+    }
+
+    const heading = document.createElement("h3");
+    const link = document.createElement("a");
+    link.href = `./restaurant.html?slug=${encodeURIComponent(restaurant.slug)}${review.category ? `&category=${encodeURIComponent(review.category)}` : ""}`;
+    link.textContent = restaurant.name;
+    heading.append(link);
+    card.append(heading);
+
+    const details = document.createElement("p");
+    details.className = "recent-review-details";
+    details.textContent = reviewDetailParts(review, restaurant).join(" · ");
+    card.append(details);
+
+    if (review.comments?.trim()) {
+      const quote = document.createElement("blockquote");
+      quote.textContent = `“${review.comments.trim()}”`;
+      card.append(quote);
+    }
+
+    const cite = document.createElement("cite");
+    cite.textContent = `— ${review.reviewer_name || "Anonymous inspector"}`;
+    card.append(cite);
+
+    els.recentReviews.append(card);
+  });
 }
 
 async function loadDirectory() {
@@ -494,7 +575,7 @@ async function loadDirectory() {
       .order("name", { ascending: true }),
     supabase
       .from("reviews")
-      .select("restaurant_id, category, reviewer_name, flavor, clam_quantity, freshness, value_score, portion, worth_the_drive, comments, created_at")
+      .select("restaurant_id, category, preparation, reviewer_name, flavor, clam_quantity, freshness, value_score, portion, worth_the_drive, comments, created_at")
       .order("created_at", { ascending: false })
   ]);
 
@@ -503,7 +584,8 @@ async function loadDirectory() {
     els.featuredCards.innerHTML = '<p class="empty-state error-state">Featured restaurants are unavailable right now.</p>';
     els.restaurantList.innerHTML = '<p class="empty-state error-state">The restaurant directory is unavailable right now.</p>';
     els.rankGrid.innerHTML = '<p class="empty-state error-state">Rankings are unavailable right now.</p>';
-    els.latestFirstBowl.textContent = "Latest review unavailable right now.";
+    els.latestReview.textContent = "Latest review unavailable right now.";
+    els.recentReviews.innerHTML = '<p class="empty-state error-state">Recent reviews are unavailable right now.</p>';
     els.reviewForm.querySelector("button[type='submit']").disabled = true;
     console.error(error);
     return;
@@ -519,7 +601,7 @@ async function loadDirectory() {
 
   reviews.forEach((review) => {
     const restaurant = restaurantById.get(review.restaurant_id);
-    const average = firstBowlAverage(review);
+    const average = reviewAverage(review);
     if (!restaurant) return;
 
     const driveScore = Number(review.worth_the_drive);
@@ -551,17 +633,14 @@ async function loadDirectory() {
     });
   });
 
-  const firstBowlRestaurant = restaurants.find((restaurant) => restaurant.slug === FIRST_BOWL_SLUG);
-  const firstBowlReviews = firstBowlRestaurant
-    ? reviews.filter((review) => review.restaurant_id === firstBowlRestaurant.id && review.category === "ri")
-    : [];
-
   renderRegions();
   renderRankings();
   renderFeatured();
   renderRestaurantList();
   renderDriveMap();
-  renderLatestFirstBowlReview(firstBowlReviews[0] ?? null);
+  const latestReview = reviews.find((review) => restaurantById.has(review.restaurant_id));
+  renderLatestReview(latestReview ?? null, latestReview ? restaurantById.get(latestReview.restaurant_id) : null);
+  renderRecentReviews(reviews, restaurantById);
 }
 
 function bindEvents() {

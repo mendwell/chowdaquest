@@ -348,7 +348,7 @@ letter-spacing: normal;
 
 .section-heading h2,
 .panel h2,
-.testimonials h2 {
+.recent-reviews-section h2 {
   margin: 0;
   font-size: 32px;
   letter-spacing: -.035em;
@@ -870,33 +870,62 @@ input, select, textarea {
   font-weight: 900;
 }
 
-.testimonials h2 {
+.recent-reviews-section h2 {
   text-align: center;
   margin-bottom: 18px;
 }
 
-.testimonial-grid {
+.recent-review-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 14px;
 }
 
-blockquote {
+.recent-review-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin: 0;
   padding: 18px;
   border: 2px solid #b99c65;
   border-radius: 10px;
   background: #f3e4c6;
   box-shadow: var(--shadow);
-  color: #8a241c;
-  font-family: "Manrope", system-ui, sans-serif; letter-spacing: normal;
-  font-size: 19px;
-  text-align: center;
 }
 
-cite {
+.recent-review-card h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.recent-review-score,
+.recent-review-details {
+  margin: 0;
+  font-weight: 800;
+}
+
+.recent-review-score {
+  color: var(--red);
+}
+
+.recent-review-details {
+  color: #5f563f;
+  font-size: 14px;
+}
+
+.recent-review-card blockquote {
+  margin: 4px 0 0;
+  color: #8a241c;
+  font-family: "Manrope", system-ui, sans-serif;
+  font-size: 17px;
+  font-style: italic;
+  letter-spacing: normal;
+  line-height: 1.35;
+}
+
+.recent-review-card cite {
   display: block;
-  margin-top: 12px;
+  margin-top: auto;
   color: var(--navy);
   font-family: Inter, sans-serif;
   font-size: 13px;
@@ -951,6 +980,17 @@ cite {
   color: var(--red);
   font-size: 24px;
   font-weight: 800;
+}
+
+.latest-review h3 {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.latest-review-details {
+  margin: 0 0 12px;
+  color: #5f563f;
+  font-weight: 700;
 }
 
 .latest-review blockquote {
@@ -1048,7 +1088,7 @@ input[type="range"] {
   }
   .rank-grid,
   .restaurant-cards,
-  .testimonial-grid {
+  .recent-review-grid {
     grid-template-columns: 1fr 1fr;
   }
   .content-grid,
@@ -1083,7 +1123,7 @@ input[type="range"] {
   h1 { font-size: 58px; }
   .rank-grid,
   .restaurant-cards,
-  .testimonial-grid {
+  .recent-review-grid {
     grid-template-columns: 1fr;
   }
   .ribbon { margin-left: 14px; }
