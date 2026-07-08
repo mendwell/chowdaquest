@@ -501,6 +501,44 @@ letter-spacing: normal;
   font-weight: 800;
 }
 
+.detail-category-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.category-summary-card {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid #b99c65;
+  border-radius: 10px;
+  background: #fff8e8;
+  color: var(--navy);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.category-summary-card:hover,
+.category-summary-card:focus-visible,
+.category-summary-card[aria-pressed="true"] {
+  border-color: var(--red);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(166, 39, 31, .15);
+}
+
+.category-summary-card strong {
+  font-weight: 900;
+}
+
+.category-summary-card span {
+  color: #5f563f;
+  font-size: 13px;
+  font-weight: 800;
+}
+
 .verified-badge {
   width: fit-content;
   margin: 10px 0;
@@ -555,6 +593,15 @@ letter-spacing: normal;
   box-shadow: var(--shadow-card);
 }
 
+.detail-score-label {
+  margin: 0 0 8px;
+  color: var(--red);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
 .detail-score-card strong {
   display: block;
   font-size: 38px;
@@ -570,6 +617,14 @@ letter-spacing: normal;
   color: var(--red);
   font-size: 26px;
   letter-spacing: .08em;
+}
+
+.detail-overall-score {
+  margin: 14px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid #d7bd88;
+  color: #5f563f;
+  font-weight: 800;
 }
 
 .detail-content-grid {
@@ -617,6 +672,47 @@ letter-spacing: normal;
   color: var(--navy);
   font-size: 12px;
   font-weight: 800;
+}
+
+.restaurant-recent-reviews {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #d7bd88;
+}
+
+.restaurant-recent-reviews h3 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+
+.mini-review-list {
+  display: grid;
+  gap: 10px;
+}
+
+.mini-review-card {
+  padding: 12px;
+  border: 1px solid #d7bd88;
+  border-radius: 10px;
+  background: #fff8e8;
+}
+
+.mini-review-card strong,
+.mini-review-card p,
+.mini-review-card blockquote {
+  margin: 0;
+}
+
+.mini-review-card p {
+  margin-top: 4px;
+  color: var(--red);
+  font-weight: 800;
+}
+
+.mini-review-card blockquote {
+  margin-top: 8px;
+  color: #4b3825;
+  font-style: italic;
 }
 
 .rankings-main {
@@ -756,6 +852,32 @@ letter-spacing: normal;
 letter-spacing: normal;
   font-size: 22px;
   font-style: italic;
+}
+
+.drive-filter {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  color: var(--navy);
+  font-weight: 800;
+}
+
+.drive-filter span {
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.drive-filter select {
+  width: 100%;
+  padding: 11px 38px 11px 12px;
+  border: 2px solid #b99c65;
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--navy);
+  font: inherit;
+  font-weight: 800;
 }
 
 .ri-map {
@@ -1074,6 +1196,16 @@ input[type="range"] {
   font-family: "Manrope", system-ui, sans-serif; letter-spacing: normal;
   font-size: 24px;
   font-style: italic;
+}
+
+.footer-feedback {
+  margin: 8px 0;
+}
+
+.footer-feedback a {
+  color: #f8edd4;
+  font-weight: 800;
+  text-underline-offset: 3px;
 }
 
 @media (max-width: 980px) {

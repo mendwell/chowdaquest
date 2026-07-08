@@ -30,7 +30,6 @@
         <a href="./rankings.html">Rankings</a>
         <a href="#explore">Explore</a>
         <a href="#drive">Cross the Bridge Score™</a>
-        <a href="#feedback">Feedback</a>
         <button class="add-review" data-scroll="#feedback">+ Add Review</button>
       </nav>
     </div>
@@ -70,6 +69,17 @@
         <aside class="panel drive-panel" id="drive">
           <h2>Cross the Bridge Score™</h2>
           <p class="quote">“Would you cross the bridge for it?”</p>
+          <label class="drive-filter" for="driveCategory">
+            <span>Show map pins for</span>
+            <select id="driveCategory">
+              <option value="">All categories</option>
+              <option value="ri">RI Chowder</option>
+              <option value="ne">New England Chowder</option>
+              <option value="manhattan">Manhattan Chowder</option>
+              <option value="cakes">Clam Cakes</option>
+              <option value="lobster">Lobster Rolls</option>
+            </select>
+          </label>
           <div id="driveMap" class="ri-map" aria-label="Map of ChowdaQuest restaurants in Rhode Island"></div>
           <button class="button primary full" type="button" data-scroll="#explore">⚓ See All Destinations</button>
         </aside>
@@ -172,9 +182,9 @@
         <strong>ChowdaQuest</strong>
         <p>Rhode ⚓ Island</p>
       </div>
-      <p class="footer-quote">“The bowl never lies. Neither does Chowder.”</p>
+      <p class="footer-quote">Local knowledge. Honest reviews. Rhode Island proud.</p>
       <div>
-        <p>Local knowledge. Independent rankings. Rhode Island proud.</p>
+        <p class="footer-feedback">Got feedback? Email <a href="mailto:meow@chowdaquest.com">meow@chowdaquest.com</a>.</p>
         <small>© 2026 ChowdaQuest</small>
       </div>
     </div>

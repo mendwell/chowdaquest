@@ -26,6 +26,7 @@ const REVIEW_SCORE_FIELDS = ["flavor", "clam_quantity", "freshness", "value_scor
 const NEW_RESTAURANT_VALUE = "__new_restaurant__";
 const liveRatings = new Map();
 const driveRatings = new Map();
+const categoryDriveRatings = new Map();
 
 const preparationLabels = {
   cold_mayo: "Cold with mayo",
@@ -79,6 +80,7 @@ const els = {
   reviewStatus: document.querySelector("#reviewStatus"),
   latestReview: document.querySelector("#latest-review"),
   recentReviews: document.querySelector("#recentReviews"),
+  driveCategory: document.querySelector("#driveCategory"),
   driveMap: document.querySelector("#driveMap")
 };
 
@@ -98,8 +100,10 @@ function renderDriveMap() {
   }
 
   driveMarkers.clearLayers();
+  const activeDriveCategory = els.driveCategory?.value || "";
   const mappedRestaurants = restaurants.filter((restaurant) => {
     if (restaurant.latitude === null || restaurant.longitude === null) return false;
+    if (activeDriveCategory && !restaurantServes(restaurant, activeDriveCategory)) return false;
 
     const latitude = Number(restaurant.latitude);
     const longitude = Number(restaurant.longitude);
@@ -109,10 +113,13 @@ function renderDriveMap() {
   });
 
   mappedRestaurants.forEach((restaurant) => {
-    const driveRating = driveRatings.get(restaurant.id);
+    const driveRating = activeDriveCategory
+      ? categoryDriveRatings.get(`${restaurant.id}:${activeDriveCategory}`)
+      : driveRatings.get(restaurant.id);
+    const categoryLabel = activeDriveCategory ? categories[activeDriveCategory] : "";
     const link = document.createElement("a");
-    link.href = `./restaurant.html?slug=${encodeURIComponent(restaurant.slug)}`;
-    link.textContent = "View restaurant & reviews";
+    link.href = `./restaurant.html?slug=${encodeURIComponent(restaurant.slug)}${activeDriveCategory ? `&category=${encodeURIComponent(activeDriveCategory)}` : ""}`;
+    link.textContent = activeDriveCategory ? `View ${categoryLabel} reviews` : "View restaurant & reviews";
 
     const name = document.createElement("strong");
     name.textContent = restaurant.name;
@@ -124,10 +131,13 @@ function renderDriveMap() {
     rating.className = driveRating ? "drive-popup-rating" : "drive-popup-pending";
     if (driveRating) {
       const reviewLabel = `${driveRating.reviewCount} ${driveRating.reviewCount === 1 ? "review" : "reviews"}`;
-      rating.textContent = `Cross the Bridge Score: ${driveRating.value.toFixed(1)}/10 · ${reviewLabel}`;
-      rating.setAttribute("aria-label", `Cross the Bridge Score ${driveRating.value.toFixed(1)} out of 10 from ${reviewLabel}`);
+      const scoreLabel = activeDriveCategory ? `${categoryLabel} Cross the Bridge Score` : "Restaurant-wide Cross the Bridge Score";
+      rating.textContent = `${scoreLabel}: ${driveRating.value.toFixed(1)}/10 · ${reviewLabel}`;
+      rating.setAttribute("aria-label", `${scoreLabel} ${driveRating.value.toFixed(1)} out of 10 from ${reviewLabel}`);
     } else {
-      rating.textContent = "Cross the Bridge Score: Not yet rated";
+      rating.textContent = activeDriveCategory
+        ? `${categoryLabel} Cross the Bridge Score: Not yet rated`
+        : "Restaurant-wide Cross the Bridge Score: Not yet rated";
     }
 
     const popup = document.createElement("div");
@@ -141,6 +151,8 @@ function renderDriveMap() {
 
   if (mappedRestaurants.length) {
     driveMap.fitBounds(driveMarkers.getBounds(), { padding: [24, 24], maxZoom: 12 });
+  } else {
+    driveMap.setView([41.58, -71.48], 9);
   }
 }
 
@@ -596,8 +608,10 @@ async function loadDirectory() {
   const restaurantById = new Map(restaurants.map((restaurant) => [restaurant.id, restaurant]));
   const groupedScores = new Map();
   const groupedDriveScores = new Map();
+  const groupedCategoryDriveScores = new Map();
   liveRatings.clear();
   driveRatings.clear();
+  categoryDriveRatings.clear();
 
   reviews.forEach((review) => {
     const restaurant = restaurantById.get(review.restaurant_id);
@@ -609,6 +623,13 @@ async function loadDirectory() {
       const driveScores = groupedDriveScores.get(restaurant.id) ?? [];
       driveScores.push(driveScore);
       groupedDriveScores.set(restaurant.id, driveScores);
+
+      if (review.category) {
+        const categoryDriveKey = `${restaurant.id}:${review.category}`;
+        const categoryDriveScores = groupedCategoryDriveScores.get(categoryDriveKey) ?? [];
+        categoryDriveScores.push(driveScore);
+        groupedCategoryDriveScores.set(categoryDriveKey, categoryDriveScores);
+      }
     }
 
     if (average === null || !review.category) return;
@@ -628,6 +649,13 @@ async function loadDirectory() {
 
   groupedDriveScores.forEach((scores, restaurantId) => {
     driveRatings.set(restaurantId, {
+      value: scores.reduce((total, value) => total + value, 0) / scores.length,
+      reviewCount: scores.length
+    });
+  });
+
+  groupedCategoryDriveScores.forEach((scores, key) => {
+    categoryDriveRatings.set(key, {
       value: scores.reduce((total, value) => total + value, 0) / scores.length,
       reviewCount: scores.length
     });
@@ -670,6 +698,7 @@ function bindEvents() {
     input.addEventListener("input", renderRestaurantList);
   });
 
+  els.driveCategory?.addEventListener("input", renderDriveMap);
   els.searchButton.addEventListener("click", renderRestaurantList);
   els.reviewRestaurant.addEventListener("change", updateReviewFormMode);
   els.reviewCategory.addEventListener("change", updatePreparationField);

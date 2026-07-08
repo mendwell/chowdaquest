@@ -15,6 +15,7 @@ const MENU_FIELDS = [
 ];
 const REVIEW_CATEGORIES = {
   ri: { field: "has_ri_chowder", label: "Rhode Island Chowder", rateHeading: "Rate This Rhode Island Chowder" },
+  manhattan: { field: "has_manhattan_chowder", label: "Manhattan Chowder", rateHeading: "Rate This Manhattan Chowder" },
   ne: { field: "has_ne_chowder", label: "New England Chowder", rateHeading: "Rate This New England Chowder" },
   cakes: { field: "has_clam_cakes", label: "Clam Cakes", rateHeading: "Rate These Clam Cakes" },
   lobster: { field: "has_lobster_roll", label: "Lobster Rolls", rateHeading: "Rate This Lobster Roll" }
@@ -27,6 +28,7 @@ const PREPARATION_LABELS = {
 const slug = new URLSearchParams(window.location.search).get("slug") || "flos-middletown";
 let restaurant;
 let activeCategory = "ri";
+let allReviews = [];
 
 const els = {
   name: document.querySelector("#detailName"),
@@ -34,11 +36,13 @@ const els = {
   photo: document.querySelector("#detailPhoto"),
   verification: document.querySelector("#detailVerification"),
   tags: document.querySelector("#detailTags"),
+  categorySummary: document.querySelector("#detailCategorySummary"),
   categoryControl: document.querySelector("#detailCategoryControl"),
   category: document.querySelector("#detailCategory"),
   facts: document.querySelector("#detailFacts"),
   score: document.querySelector("#detailScore"),
   reviews: document.querySelector("#detailReviews"),
+  recentReviews: document.querySelector("#detailRecentReviews"),
   reviewsHeading: document.querySelector("#detailReviewsHeading"),
   reviewPanel: document.querySelector("#review"),
   reviewHeading: document.querySelector("#detailReviewHeading"),
@@ -53,6 +57,19 @@ function reviewAverage(review) {
   const values = SCORE_FIELDS
     .filter((field) => review[field] !== null && review[field] !== undefined)
     .map((field) => Number(review[field]))
+    .filter((value) => Number.isFinite(value) && value >= 1 && value <= 10);
+
+  return values.length ? values.reduce((total, value) => total + value, 0) / values.length : null;
+}
+
+function reviewAverageGroup(reviews) {
+  const values = reviews.map(reviewAverage).filter((value) => value !== null);
+  return values.length ? values.reduce((total, value) => total + value, 0) / values.length : null;
+}
+
+function crossBridgeAverage(reviews) {
+  const values = reviews
+    .map((review) => Number(review.worth_the_drive))
     .filter((value) => Number.isFinite(value) && value >= 1 && value <= 10);
 
   return values.length ? values.reduce((total, value) => total + value, 0) / values.length : null;
@@ -99,6 +116,18 @@ function availableReviewCategories() {
   return Object.entries(REVIEW_CATEGORIES).filter(([, category]) => restaurant[category.field]);
 }
 
+function reviewCategoryLabel(review) {
+  const parts = [REVIEW_CATEGORIES[review.category]?.label || "Review"];
+  if (review.category === "lobster" && PREPARATION_LABELS[review.preparation]) {
+    parts.push(PREPARATION_LABELS[review.preparation]);
+  }
+  return parts.join(" · ");
+}
+
+function categoryReviews(category) {
+  return allReviews.filter((review) => review.category === category);
+}
+
 function renderCategoryControl() {
   const categories = availableReviewCategories();
   els.category.replaceChildren();
@@ -118,6 +147,51 @@ function renderCategoryControl() {
   els.categoryControl.hidden = !categories.length;
   els.reviewPanel.hidden = !categories.length;
   updateCategoryCopy();
+  renderCategorySummary();
+}
+
+function renderCategorySummary() {
+  els.categorySummary.replaceChildren();
+  const categories = availableReviewCategories();
+
+  if (!categories.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty-state";
+    empty.textContent = "No review categories are listed for this restaurant yet.";
+    els.categorySummary.append(empty);
+    return;
+  }
+
+  categories.forEach(([value, category]) => {
+    const reviews = categoryReviews(value);
+    const average = reviewAverageGroup(reviews);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "category-summary-card";
+    button.dataset.category = value;
+    button.setAttribute("aria-pressed", String(value === activeCategory));
+
+    const label = document.createElement("strong");
+    label.textContent = category.label;
+
+    const meta = document.createElement("span");
+    const reviewCount = reviews.length;
+    const reviewLabel = `${reviewCount} ${reviewCount === 1 ? "review" : "reviews"}`;
+    meta.textContent = average === null
+      ? `${reviewLabel} · not rated yet`
+      : `${reviewLabel} · ${average.toFixed(1)}/10`;
+
+    button.append(label, meta);
+    button.addEventListener("click", () => {
+      activeCategory = value;
+      els.category.value = value;
+      updateCategoryCopy();
+      setStatus("");
+      updateCategoryUrl();
+      renderPageReviews();
+    });
+    els.categorySummary.append(button);
+  });
 }
 
 function updateCategoryCopy() {
@@ -129,6 +203,12 @@ function updateCategoryCopy() {
   els.preparation.disabled = !isLobsterRoll;
   els.preparation.required = isLobsterRoll;
   els.quantityLabel.textContent = isLobsterRoll ? "Lobster Quantity" : "Clam Quantity";
+}
+
+function updateCategoryUrl() {
+  const url = new URL(window.location.href);
+  url.searchParams.set("category", activeCategory);
+  window.history.replaceState({}, "", url);
 }
 
 function renderRestaurant() {
@@ -179,30 +259,43 @@ function renderRestaurant() {
 }
 
 function renderScore(reviews) {
-  const reviewScores = reviews.map(reviewAverage).filter((value) => value !== null);
   els.score.replaceChildren();
+  const category = REVIEW_CATEGORIES[activeCategory];
+  const bridgeAverage = crossBridgeAverage(reviews);
+  const overallAverage = reviewAverageGroup(reviews);
 
-  if (!reviewScores.length) {
+  const label = document.createElement("p");
+  label.className = "detail-score-label";
+  label.textContent = "Cross the Bridge Score™";
+  els.score.append(label);
+
+  if (bridgeAverage === null) {
     const heading = document.createElement("strong");
     heading.textContent = "Not rated yet";
     const copy = document.createElement("p");
-    copy.textContent = `Be the first inspector to rate the ${REVIEW_CATEGORIES[activeCategory].label.toLowerCase()}.`;
+    copy.textContent = `Would you cross the bridge for ${category.label} here? Be the first to weigh in.`;
     els.score.append(heading, copy);
     return;
   }
 
-  const average = reviewScores.reduce((total, value) => total + value, 0) / reviewScores.length;
   const starsLine = document.createElement("p");
   starsLine.className = "detail-stars";
-  starsLine.textContent = stars(average);
-  starsLine.setAttribute("aria-label", `${average.toFixed(1)} out of 10`);
+  starsLine.textContent = stars(bridgeAverage);
+  starsLine.setAttribute("aria-label", `${bridgeAverage.toFixed(1)} out of 10`);
 
   const value = document.createElement("strong");
-  value.textContent = `${average.toFixed(1)}/10`;
+  value.textContent = `${bridgeAverage.toFixed(1)}/10`;
 
   const count = document.createElement("small");
-  count.textContent = `${reviewScores.length} ${reviewScores.length === 1 ? "review" : "reviews"}`;
+  count.textContent = `${reviews.length} ${reviews.length === 1 ? "review" : "reviews"}`;
   els.score.append(starsLine, value, count);
+
+  if (overallAverage !== null) {
+    const overall = document.createElement("p");
+    overall.className = "detail-overall-score";
+    overall.textContent = `Overall ${category.label} rating: ${overallAverage.toFixed(1)}/10`;
+    els.score.append(overall);
+  }
 }
 
 function renderReviews(reviews) {
@@ -253,17 +346,69 @@ function renderReviews(reviews) {
   });
 }
 
+function renderRecentRestaurantReviews() {
+  els.recentReviews.replaceChildren();
+
+  const heading = document.createElement("h3");
+  heading.textContent = "Recent Reviews for This Restaurant";
+  els.recentReviews.append(heading);
+
+  if (!allReviews.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty-state";
+    empty.textContent = "No reviews for this restaurant yet.";
+    els.recentReviews.append(empty);
+    return;
+  }
+
+  const list = document.createElement("div");
+  list.className = "mini-review-list";
+
+  allReviews.slice(0, 3).forEach((review) => {
+    const card = document.createElement("article");
+    card.className = "mini-review-card";
+
+    const category = document.createElement("strong");
+    category.textContent = reviewCategoryLabel(review);
+    card.append(category);
+
+    const average = reviewAverage(review);
+    const meta = document.createElement("p");
+    meta.textContent = average === null
+      ? `${review.reviewer_name || "Anonymous inspector"} · Rating unavailable`
+      : `${stars(average)} ${average.toFixed(1)}/10 · ${review.reviewer_name || "Anonymous inspector"}`;
+    card.append(meta);
+
+    if (review.comments?.trim()) {
+      const comments = document.createElement("blockquote");
+      comments.textContent = `“${review.comments.trim()}”`;
+      card.append(comments);
+    }
+
+    list.append(card);
+  });
+
+  els.recentReviews.append(list);
+}
+
+function renderPageReviews() {
+  const reviews = categoryReviews(activeCategory);
+  renderScore(reviews);
+  renderReviews(reviews);
+  renderCategorySummary();
+  renderRecentRestaurantReviews();
+}
+
 async function loadReviews() {
   const { data, error } = await supabase
     .from("reviews")
     .select("*")
     .eq("restaurant_id", restaurant.id)
-    .eq("category", activeCategory)
     .order("created_at", { ascending: false });
 
   if (error) throw error;
-  renderScore(data);
-  renderReviews(data);
+  allReviews = data;
+  renderPageReviews();
 }
 
 async function loadPage() {
@@ -341,19 +486,11 @@ els.form.querySelectorAll("input[type='range']").forEach((input) => {
 });
 
 els.form.addEventListener("submit", submitReview);
-els.category.addEventListener("change", async () => {
+els.category.addEventListener("change", () => {
   activeCategory = els.category.value;
   updateCategoryCopy();
   setStatus("");
-  els.score.innerHTML = "<p>Loading rating…</p>";
-  els.reviews.innerHTML = "<p>Loading reviews…</p>";
-
-  try {
-    await loadReviews();
-  } catch (error) {
-    els.score.textContent = "Rating unavailable.";
-    els.reviews.textContent = "Reviews unavailable right now.";
-    console.error(error);
-  }
+  updateCategoryUrl();
+  renderPageReviews();
 });
 loadPage();
