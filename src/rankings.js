@@ -13,6 +13,13 @@ const CATEGORY_FIELDS = {
   cakes: "has_clam_cakes",
   lobster: "has_lobster_roll"
 };
+const CATEGORY_LABELS = {
+  ri: "Rhode Island Chowder",
+  ne: "New England Chowder",
+  manhattan: "Manhattan Chowder",
+  cakes: "Clam Cakes",
+  lobster: "Lobster Rolls"
+};
 
 let restaurants = [];
 let reviews = [];
@@ -33,14 +40,19 @@ function reviewAverage(review) {
   return values.length ? values.reduce((total, value) => total + value, 0) / values.length : null;
 }
 
+function crossBridgeScore(review) {
+  const value = Number(review.worth_the_drive);
+  return Number.isFinite(value) && value >= 1 && value <= 10 ? value : null;
+}
+
 function stars(value) {
   const filled = Math.round(value / 2);
   return `${"★".repeat(filled)}${"☆".repeat(5 - filled)}`;
 }
 
-function createRestaurantLink(restaurant) {
+function createRestaurantLink(restaurant, category = els.category.value) {
   const link = document.createElement("a");
-  link.href = `./restaurant.html?slug=${encodeURIComponent(restaurant.slug)}`;
+  link.href = `./restaurant.html?slug=${encodeURIComponent(restaurant.slug)}&category=${encodeURIComponent(category)}`;
   link.textContent = restaurant.name;
   return link;
 }
@@ -72,6 +84,13 @@ function renderRankedRow(item, index) {
   count.textContent = `${item.reviewCount} ${item.reviewCount === 1 ? "review" : "reviews"}`;
   rating.append(starLine, value, count);
 
+  if (item.bridgeValue !== null) {
+    const bridge = document.createElement("small");
+    bridge.className = "ranking-bridge-score";
+    bridge.textContent = `Cross the Bridge: ${item.bridgeValue.toFixed(1)}/10`;
+    rating.append(bridge);
+  }
+
   row.append(rank, identity, rating);
   return row;
 }
@@ -94,6 +113,7 @@ function renderAwaitingRow(restaurant) {
 
 function renderRankings() {
   const category = els.category.value;
+  const categoryLabel = CATEGORY_LABELS[category] || "Selected Category";
   const region = els.region.value;
   const eligible = restaurants.filter(
     (restaurant) => restaurant[CATEGORY_FIELDS[category]] && (!region || restaurant.region === region)
@@ -106,17 +126,26 @@ function renderRankings() {
     .forEach((review) => {
       const average = reviewAverage(review);
       if (average === null) return;
-      const scores = grouped.get(review.restaurant_id) ?? [];
-      scores.push(average);
-      grouped.set(review.restaurant_id, scores);
+      const group = grouped.get(review.restaurant_id) ?? { scores: [], bridgeScores: [] };
+      group.scores.push(average);
+      const bridgeScore = crossBridgeScore(review);
+      if (bridgeScore !== null) group.bridgeScores.push(bridgeScore);
+      grouped.set(review.restaurant_id, group);
     });
 
   const ranked = [...grouped.entries()]
-    .map(([restaurantId, scores]) => ({
-      restaurant: restaurantById.get(restaurantId),
-      value: scores.reduce((total, value) => total + value, 0) / scores.length,
-      reviewCount: scores.length
-    }))
+    .map(([restaurantId, group]) => {
+      const bridgeValue = group.bridgeScores.length
+        ? group.bridgeScores.reduce((total, value) => total + value, 0) / group.bridgeScores.length
+        : null;
+
+      return {
+        restaurant: restaurantById.get(restaurantId),
+        value: group.scores.reduce((total, value) => total + value, 0) / group.scores.length,
+        bridgeValue,
+        reviewCount: group.scores.length
+      };
+    })
     .sort((a, b) => b.value - a.value || b.reviewCount - a.reviewCount || a.restaurant.name.localeCompare(b.restaurant.name));
 
   const rankedIds = new Set(ranked.map((item) => item.restaurant.id));
@@ -130,7 +159,7 @@ function renderRankings() {
     const standings = document.createElement("section");
     standings.className = "ranking-group";
     const heading = document.createElement("h2");
-    heading.textContent = "Current Standings";
+    heading.textContent = `${categoryLabel} Standings`;
     standings.append(heading, ...ranked.map(renderRankedRow));
     els.list.append(standings);
   }
@@ -139,7 +168,7 @@ function renderRankings() {
     const pending = document.createElement("section");
     pending.className = "ranking-group awaiting-group";
     const heading = document.createElement("h2");
-    heading.textContent = "Further Investigation Required";
+    heading.textContent = `${categoryLabel} Awaiting Reviews`;
     pending.append(heading, ...awaiting.map(renderAwaitingRow));
     els.list.append(pending);
   }
@@ -147,11 +176,11 @@ function renderRankings() {
   if (!eligible.length) {
     const empty = document.createElement("p");
     empty.className = "empty-state";
-    empty.textContent = "No restaurants match this category and region.";
+    empty.textContent = `No restaurants match ${categoryLabel} in this region yet.`;
     els.list.append(empty);
   }
 
-  els.status.textContent = `${ranked.length} ranked · ${awaiting.length} awaiting reports`;
+  els.status.textContent = `${categoryLabel}: ${ranked.length} ranked · ${awaiting.length} awaiting reviews`;
 }
 
 async function loadRankings() {

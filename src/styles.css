@@ -826,6 +826,11 @@ letter-spacing: normal;
   color: var(--muted);
 }
 
+.ranking-score .ranking-bridge-score {
+  color: var(--red);
+  font-weight: 900;
+}
+
 .ranking-score {
   justify-items: end;
 }
