@@ -49,7 +49,7 @@ function verificationLabel(restaurant) {
 
 const reviewDimensions = [
   { name: "flavor", label: "Flavor" },
-  { name: "clam_quantity", label: "Clam Quantity" },
+  { name: "clam_quantity", label: "Featured Ingredient Quantity" },
   { name: "freshness", label: "Freshness" },
   { name: "value_score", label: "Value" },
   { name: "portion", label: "Portion" },

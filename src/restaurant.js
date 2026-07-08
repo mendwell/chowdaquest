@@ -202,7 +202,7 @@ function updateCategoryCopy() {
   els.preparationControl.hidden = !isLobsterRoll;
   els.preparation.disabled = !isLobsterRoll;
   els.preparation.required = isLobsterRoll;
-  els.quantityLabel.textContent = isLobsterRoll ? "Lobster Quantity" : "Clam Quantity";
+  els.quantityLabel.textContent = "Featured Ingredient Quantity";
 }
 
 function updateCategoryUrl() {
