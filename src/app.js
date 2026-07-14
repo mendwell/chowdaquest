@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { firstBlockedField, flagBlockedField } from "./moderation.js";
 
 const supabase = createClient(
   "https://ztntlynbvjdwdimyxyde.supabase.co",
@@ -379,6 +380,25 @@ async function submitReview(event) {
   const selectedSlug = String(formData.get("restaurant_slug") || "");
   const category = String(formData.get("category") || "");
   const isSuggestion = selectedSlug === NEW_RESTAURANT_VALUE;
+
+  const moderatedFields = [
+    { value: formData.get("reviewer_name"), element: form.elements.reviewer_name },
+    { value: formData.get("comments"), element: form.elements.comments }
+  ];
+
+  if (isSuggestion) {
+    moderatedFields.push(
+      { value: formData.get("suggested_restaurant_name"), element: form.elements.suggested_restaurant_name },
+      { value: formData.get("suggested_restaurant_town"), element: form.elements.suggested_restaurant_town }
+    );
+  }
+
+  const blockedField = firstBlockedField(moderatedFields);
+  if (blockedField) {
+    setReviewStatus("Please revise your submission to remove offensive or explicit language.", "error");
+    flagBlockedField(blockedField.element);
+    return;
+  }
 
   submitButton.disabled = true;
   setReviewStatus(isSuggestion ? "Sending your restaurant suggestion…" : "Saving your review…");

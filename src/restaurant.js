@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { firstBlockedField, flagBlockedField } from "./moderation.js";
 
 const supabase = createClient(
   "https://ztntlynbvjdwdimyxyde.supabase.co",
@@ -444,6 +445,17 @@ async function submitReview(event) {
   event.preventDefault();
   const button = els.form.querySelector("button[type='submit']");
   const formData = new FormData(els.form);
+
+  const blockedField = firstBlockedField([
+    { value: formData.get("reviewer_name"), element: els.form.elements.reviewer_name },
+    { value: formData.get("comments"), element: els.form.elements.comments }
+  ]);
+
+  if (blockedField) {
+    setStatus("Please revise your review to remove offensive or explicit language.", "error");
+    flagBlockedField(blockedField.element);
+    return;
+  }
 
   button.disabled = true;
   setStatus("Saving your review…");

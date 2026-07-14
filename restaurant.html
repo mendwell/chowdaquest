@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./src/styles.css?v=20260708-a11y" />
+  <link rel="stylesheet" href="./src/styles.css?v=20260708-moderation" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/chowder-favicon.png">
 </head>
 <body>
@@ -94,6 +94,7 @@
 
             <label for="detailComments">Review notes</label>
             <textarea id="detailComments" name="comments" rows="4" placeholder="Be honest. Chowder can handle it."></textarea>
+            <p class="form-guidance">Keep it honest and respectful. Reviews containing offensive or explicit language will not be accepted.</p>
             <button class="button primary full" type="submit">⚓ Submit Review</button>
             <p id="detailReviewStatus" class="form-status" role="status" aria-live="polite"></p>
           </form>
@@ -113,6 +114,6 @@
     </div>
   </footer>
 
-  <script type="module" src="./src/restaurant.js?v=20260708-rating-copy"></script>
+  <script type="module" src="./src/restaurant.js?v=20260708-moderation"></script>
 </body>
 </html>
