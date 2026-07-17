@@ -94,6 +94,9 @@
 
             <label for="detailComments">Review notes</label>
             <textarea id="detailComments" name="comments" rows="4" placeholder="Be honest. Chowder can handle it."></textarea>
+            <label for="detailReviewPhoto">Food photo <span>(optional)</span></label>
+            <input id="detailReviewPhoto" name="review_photo" type="file" accept="image/jpeg,image/png,image/webp" />
+            <p class="form-guidance">Optional: upload a JPG, PNG, or WebP photo under 5 MB.</p>
             <p class="form-guidance">Keep it honest and respectful. Reviews containing offensive or explicit language will not be accepted.</p>
             <button class="button primary full" type="submit">⚓ Submit Review</button>
             <p id="detailReviewStatus" class="form-status" role="status" aria-live="polite"></p>
@@ -114,6 +117,6 @@
     </div>
   </footer>
 
-  <script type="module" src="./src/restaurant.js?v=20260717-stuffies"></script>
+  <script type="module" src="./src/restaurant.js?v=20260717-review-photos"></script>
 </body>
 </html>

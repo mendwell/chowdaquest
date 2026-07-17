@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { firstBlockedField, flagBlockedField } from "./moderation.js";
+import { appendReviewPhoto, getSelectedReviewPhoto, uploadReviewPhoto, validateReviewPhoto } from "./reviewPhotos.js";
 
 const supabase = createClient(
   "https://ztntlynbvjdwdimyxyde.supabase.co",
@@ -350,6 +351,8 @@ function renderReviews(reviews) {
       card.append(comments);
     }
 
+    appendReviewPhoto(card, review);
+
     els.reviews.append(card);
   });
 }
@@ -392,6 +395,8 @@ function renderRecentRestaurantReviews() {
       comments.textContent = `“${review.comments.trim()}”`;
       card.append(comments);
     }
+
+    appendReviewPhoto(card, review);
 
     list.append(card);
   });
@@ -464,6 +469,14 @@ async function submitReview(event) {
     return;
   }
 
+  const photoFile = getSelectedReviewPhoto(formData);
+  const photoError = validateReviewPhoto(photoFile);
+  if (photoError) {
+    setStatus(photoError, "error");
+    flagBlockedField(els.form.elements.review_photo);
+    return;
+  }
+
   button.disabled = true;
   setStatus("Saving your review…");
 
@@ -482,6 +495,25 @@ async function submitReview(event) {
 
   if (activeCategory === "lobster") review.preparation = formData.get("preparation");
 
+  if (photoFile) {
+    try {
+      setStatus("Uploading your food photo…");
+      Object.assign(review, await uploadReviewPhoto({
+        supabase,
+        file: photoFile,
+        restaurant,
+        category: activeCategory,
+        categoryLabel: REVIEW_CATEGORIES[activeCategory]?.label
+      }));
+    } catch (error) {
+      setStatus(saveErrorMessage(error, "Your photo didn't upload."), "error");
+      console.error(error);
+      button.disabled = false;
+      return;
+    }
+  }
+
+  setStatus("Saving your review…");
   const { error } = await supabase.from("reviews").insert(review);
 
   if (error) {

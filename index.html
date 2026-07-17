@@ -165,6 +165,9 @@
             <div class="sliders" id="sliders"></div>
             <label for="reviewNotes">Review notes</label>
             <textarea id="reviewNotes" name="comments" rows="4" placeholder="Be honest. Chowder can handle it."></textarea>
+            <label for="reviewPhoto">Food photo <span>(optional)</span></label>
+            <input id="reviewPhoto" name="review_photo" type="file" accept="image/jpeg,image/png,image/webp" />
+            <p class="form-guidance">Optional: upload a JPG, PNG, or WebP photo under 5 MB.</p>
             <p class="form-guidance">Keep it honest and respectful. Reviews containing offensive or explicit language will not be accepted.</p>
             <button class="button primary full" id="reviewSubmit" type="submit">⚓ Submit Review</button>
             <p id="reviewStatus" class="form-status" role="status" aria-live="polite"></p>
@@ -196,6 +199,6 @@
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script type="module" src="./src/app.js?v=20260717-stuffies"></script>
+  <script type="module" src="./src/app.js?v=20260717-review-photos"></script>
 </body>
 </html>

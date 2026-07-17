@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { firstBlockedField, flagBlockedField } from "./moderation.js";
+import { appendReviewPhoto, getSelectedReviewPhoto, uploadReviewPhoto, validateReviewPhoto } from "./reviewPhotos.js";
 
 const supabase = createClient(
   "https://ztntlynbvjdwdimyxyde.supabase.co",
@@ -407,6 +408,20 @@ async function submitReview(event) {
     return;
   }
 
+  const photoFile = getSelectedReviewPhoto(formData);
+  const photoError = validateReviewPhoto(photoFile);
+  if (photoError) {
+    setReviewStatus(photoError, "error");
+    flagBlockedField(form.elements.review_photo);
+    return;
+  }
+
+  if (isSuggestion && photoFile) {
+    setReviewStatus("Photo uploads can be added after the restaurant is verified and listed.", "error");
+    flagBlockedField(form.elements.review_photo);
+    return;
+  }
+
   submitButton.disabled = true;
   setReviewStatus(isSuggestion ? "Sending your restaurant suggestion…" : "Saving your review…");
 
@@ -443,6 +458,26 @@ async function submitReview(event) {
     return;
   }
 
+  let photoFields = {};
+  if (photoFile) {
+    try {
+      setReviewStatus("Uploading your food photo…");
+      photoFields = await uploadReviewPhoto({
+        supabase,
+        file: photoFile,
+        restaurant,
+        category,
+        categoryLabel: categories[category]
+      });
+    } catch (error) {
+      setReviewStatus(saveErrorMessage(error, "Your photo didn't upload."), "error");
+      console.error(error);
+      submitButton.disabled = false;
+      return;
+    }
+  }
+
+  setReviewStatus("Saving your review…");
   const { error } = await supabase.from("reviews").insert({
     restaurant_id: restaurant.id,
     reviewer_name: formData.get("reviewer_name"),
@@ -454,7 +489,8 @@ async function submitReview(event) {
     value_score: Number(formData.get("value_score")),
     portion: Number(formData.get("portion")),
     worth_the_drive: Number(formData.get("worth_the_drive")),
-    comments: formData.get("comments")
+    comments: formData.get("comments"),
+    ...photoFields
   });
 
   if (error) {
@@ -548,6 +584,8 @@ function renderLatestReview(review, restaurant) {
     card.append(notes);
   }
 
+  appendReviewPhoto(card, review);
+
   els.latestReview.append(card);
 }
 
@@ -598,6 +636,8 @@ function renderRecentReviews(reviews, restaurantById) {
       card.append(quote);
     }
 
+    appendReviewPhoto(card, review);
+
     const cite = document.createElement("cite");
     cite.textContent = `— ${review.reviewer_name || "Anonymous inspector"}`;
     card.append(cite);
@@ -617,7 +657,7 @@ async function loadDirectory() {
       .order("name", { ascending: true }),
     supabase
       .from("reviews")
-      .select("restaurant_id, category, preparation, reviewer_name, flavor, clam_quantity, freshness, value_score, portion, worth_the_drive, comments, created_at")
+      .select("restaurant_id, category, preparation, reviewer_name, flavor, clam_quantity, freshness, value_score, portion, worth_the_drive, comments, photo_url, photo_path, photo_alt, created_at")
       .order("created_at", { ascending: false })
   ]);
 
