@@ -11,14 +11,16 @@ const CATEGORY_FIELDS = {
   ne: "has_ne_chowder",
   manhattan: "has_manhattan_chowder",
   cakes: "has_clam_cakes",
-  lobster: "has_lobster_roll"
+  lobster: "has_lobster_roll",
+  stuffies: "has_stuffies"
 };
 const CATEGORY_LABELS = {
   ri: "Rhode Island Chowder",
   ne: "New England Chowder",
   manhattan: "Manhattan Chowder",
   cakes: "Clam Cakes",
-  lobster: "Lobster Rolls"
+  lobster: "Lobster Rolls",
+  stuffies: "Stuffies"
 };
 
 let restaurants = [];

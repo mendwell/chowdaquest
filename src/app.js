@@ -12,7 +12,8 @@ const categories = {
   ne: "New England Chowder",
   manhattan: "Manhattan Chowder",
   cakes: "Clam Cakes",
-  lobster: "Lobster Rolls"
+  lobster: "Lobster Rolls",
+  stuffies: "Stuffies"
 };
 
 const categoryFields = {
@@ -20,7 +21,8 @@ const categoryFields = {
   ne: ["ne", "has_ne_chowder"],
   manhattan: ["manhattan", "has_manhattan_chowder"],
   cakes: ["cakes", "has_clam_cakes"],
-  lobster: ["lobster", "has_lobster_roll"]
+  lobster: ["lobster", "has_lobster_roll"],
+  stuffies: ["stuffies", "has_stuffies"]
 };
 
 const REVIEW_SCORE_FIELDS = ["flavor", "clam_quantity", "freshness", "value_score", "portion", "worth_the_drive"];

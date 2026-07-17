@@ -6,7 +6,7 @@ create table if not exists public.restaurant_suggestions (
   name text not null check (char_length(trim(name)) between 1 and 120),
   town text not null check (char_length(trim(town)) between 1 and 80),
   website_url text check (website_url is null or char_length(website_url) <= 500),
-  suggested_category text not null check (suggested_category in ('ri', 'ne', 'manhattan', 'cakes', 'lobster')),
+  suggested_category text not null check (suggested_category in ('ri', 'ne', 'manhattan', 'cakes', 'lobster', 'stuffies')),
   suggested_by text not null check (char_length(trim(suggested_by)) between 1 and 120),
   notes text check (notes is null or char_length(notes) <= 2000),
   status text not null default 'pending' check (status in ('pending', 'approved', 'declined')),

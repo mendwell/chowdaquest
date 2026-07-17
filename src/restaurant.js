@@ -12,14 +12,16 @@ const MENU_FIELDS = [
   ["has_ne_chowder", "New England Chowder"],
   ["has_manhattan_chowder", "Manhattan Chowder"],
   ["has_clam_cakes", "Clam Cakes"],
-  ["has_lobster_roll", "Lobster Rolls"]
+  ["has_lobster_roll", "Lobster Rolls"],
+  ["has_stuffies", "Stuffies"]
 ];
 const REVIEW_CATEGORIES = {
   ri: { field: "has_ri_chowder", label: "Rhode Island Chowder", rateHeading: "Rate This Rhode Island Chowder" },
   manhattan: { field: "has_manhattan_chowder", label: "Manhattan Chowder", rateHeading: "Rate This Manhattan Chowder" },
   ne: { field: "has_ne_chowder", label: "New England Chowder", rateHeading: "Rate This New England Chowder" },
   cakes: { field: "has_clam_cakes", label: "Clam Cakes", rateHeading: "Rate These Clam Cakes" },
-  lobster: { field: "has_lobster_roll", label: "Lobster Rolls", rateHeading: "Rate This Lobster Roll" }
+  lobster: { field: "has_lobster_roll", label: "Lobster Rolls", rateHeading: "Rate This Lobster Roll" },
+  stuffies: { field: "has_stuffies", label: "Stuffies", rateHeading: "Rate These Stuffies" }
 };
 const PREPARATION_LABELS = {
   cold_mayo: "Cold with mayo",
