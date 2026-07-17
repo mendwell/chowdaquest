@@ -26,6 +26,11 @@ const PREPARATION_LABELS = {
   hot_butter: "Hot with butter"
 };
 
+function saveErrorMessage(error, fallback) {
+  const detail = error?.message?.trim();
+  return detail ? `${fallback} Supabase said: ${detail}` : fallback;
+}
+
 const slug = new URLSearchParams(window.location.search).get("slug") || "flos-middletown";
 let restaurant;
 let activeCategory = "ri";
@@ -478,7 +483,7 @@ async function submitReview(event) {
   const { error } = await supabase.from("reviews").insert(review);
 
   if (error) {
-    setStatus("Your review didn't save. Please try again.", "error");
+    setStatus(saveErrorMessage(error, "Your review didn't save."), "error");
     console.error(error);
     button.disabled = false;
     return;

@@ -38,6 +38,11 @@ function restaurantIcon(restaurant) {
   return restaurant.icon?.trim() || "🥣";
 }
 
+function saveErrorMessage(error, fallback) {
+  const detail = error?.message?.trim();
+  return detail ? `${fallback} Supabase said: ${detail}` : fallback;
+}
+
 function verificationLabel(restaurant) {
   const labels = {
     verified: "✓ Verified",
@@ -415,7 +420,7 @@ async function submitReview(event) {
     });
 
     if (error) {
-      setReviewStatus("That suggestion didn't save. Please try again.", "error");
+      setReviewStatus(saveErrorMessage(error, "That suggestion didn't save."), "error");
       console.error(error);
       submitButton.disabled = false;
       return;
@@ -451,7 +456,7 @@ async function submitReview(event) {
   });
 
   if (error) {
-    setReviewStatus("Your review didn't save. Please try again.", "error");
+    setReviewStatus(saveErrorMessage(error, "Your review didn't save."), "error");
     console.error(error);
     submitButton.disabled = false;
     return;
